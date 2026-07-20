@@ -12,7 +12,6 @@ import Event from '@material-ui/icons/Event';
 import { useModulesManager, useTranslations, formatDateFromISO } from '@openimis/fe-core';
 import { useProfileCardStyles, ProfileTile } from '../utils/profileCardStyles';
 
-/** Brand-themed read-only card for a participant/attendance record. */
 function AttendanceProfileCard({ attendance }) {
   const classes = useProfileCardStyles();
   const intl = useIntl();

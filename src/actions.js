@@ -86,10 +86,10 @@ export function fetchTraining(modulesManager, params) {
 
 export const clearTraining = () => (dispatch) => dispatch({ type: CLEAR(ACTION_TYPE.GET_TRAINING) });
 
-function formatTrainingGQL(t) {
+function formatTrainingGQL(t, includeCode = true) {
   return [
     str('id', t?.id),
-    str('code', t?.code),
+    includeCode ? str('code', t?.code) : null,
     str('title', t?.title),
     str('description', t?.description),
     str('categoryId', decId(t?.categoryId ?? t?.category?.id)),
@@ -109,7 +109,7 @@ function formatTrainingGQL(t) {
 }
 
 export function createTraining(training, clientMutationLabel) {
-  const mutation = formatMutation('createTraining', formatTrainingGQL(training), clientMutationLabel);
+  const mutation = formatMutation('createTraining', formatTrainingGQL(training, false), clientMutationLabel);
   return graphql(
     mutation.payload,
     [REQUEST(ACTION_TYPE.MUTATION), SUCCESS(ACTION_TYPE.CREATE_TRAINING), ERROR(ACTION_TYPE.MUTATION)],
@@ -118,7 +118,7 @@ export function createTraining(training, clientMutationLabel) {
 }
 
 export function updateTraining(training, clientMutationLabel) {
-  const mutation = formatMutation('updateTraining', formatTrainingGQL(training), clientMutationLabel);
+  const mutation = formatMutation('updateTraining', formatTrainingGQL(training, true), clientMutationLabel);
   return graphql(
     mutation.payload,
     [REQUEST(ACTION_TYPE.MUTATION), SUCCESS(ACTION_TYPE.UPDATE_TRAINING), ERROR(ACTION_TYPE.MUTATION)],

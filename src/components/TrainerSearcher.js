@@ -5,7 +5,7 @@ import { injectIntl } from 'react-intl';
 import {
   Grid, IconButton, Tooltip, Dialog, DialogContent, DialogActions, Button,
 } from '@material-ui/core';
-import { withTheme, withStyles } from '@material-ui/core/styles';
+import { withTheme, withStyles, makeStyles } from '@material-ui/core/styles';
 import EditIcon from '@material-ui/icons/Edit';
 import DeleteIcon from '@material-ui/icons/Delete';
 import VisibilityIcon from '@material-ui/icons/Visibility';
@@ -54,6 +54,25 @@ const Filter = injectIntl(withTheme(withStyles(defaultFilterStyles)(({ classes, 
   );
 })));
 
+//Fixed layout ( code, Full name,Type ,Organization,Email,Active,View,Edit,delete,trailong spacer)
+const useStyles = makeStyles(() => ({
+  searcher: {
+    '& table': { tableLayout: 'fixed', minWidth: '100%' },
+    '& table th, & table td': { whiteSpace: 'nowrap' },
+    '& table th:nth-child(-n+6), & table td:nth-child(-n+6)': { overflow: 'hidden', textOverflow: 'ellipsis' },
+    '& table th:nth-child(1), & table td:nth-child(1)': { width: 110 },
+    '& table th:nth-child(2), & table td:nth-child(2)': { width: 200 },
+    '& table th:nth-child(3), & table td:nth-child(3)': { width: 110 },
+    '& table th:nth-child(4), & table td:nth-child(4)': { width: 200 },
+    '& table th:nth-child(5), & table td:nth-child(5)': { width: 250 },
+    '& table th:nth-child(6), & table td:nth-child(6)': { width: 90 },
+    '& table th:nth-child(7), & table td:nth-child(7)': { width: 56 },
+    '& table th:nth-child(8), & table td:nth-child(8)': { width: 56 },
+    '& table th:nth-child(9), & table td:nth-child(9)': { width: 56 },
+    '& table th:last-child, & table td:last-child': { width: 32 },
+  },
+}));
+
 function TrainerSearcher({
   fetchTrainerProfiles, deleteTrainerProfile, journalize, coreConfirm, clearConfirm, confirmed,
   fetchingTrainers, fetchedTrainers, errorTrainers, trainerProfiles,
@@ -62,6 +81,7 @@ function TrainerSearcher({
   const history = useHistory();
   const modulesManager = useModulesManager();
   const { formatMessage, formatMessageWithValues } = useTranslations('training', modulesManager);
+  const classes = useStyles();
   const rights = useSelector((s) => s.core.user.i_user.rights ?? []);
   const [toDelete, setToDelete] = useState(null);
   const [viewed, setViewed] = useState(null);
@@ -91,36 +111,49 @@ function TrainerSearcher({
   }, [submittingMutation]);
   useEffect(() => { prev.current = submittingMutation; });
 
-  const headers = () => [
-    'training.trainer.code', 'training.trainer.fullName', 'training.trainer.type',
-    'training.trainer.organization', 'training.trainer.email', 'training.trainer.active', 'emptyLabel',
-  ];
+    const headers = () => {
+    const h = [
+      'training.trainer.code', 'training.trainer.fullName', 'training.trainer.type',
+      'training.trainer.organization', 'training.trainer.email', 'training.trainer.active',
+    ];
+    h.push('emptyLabel'); // view
+    if (rights.includes(RIGHT_TRAINER_MANAGE)) {
+      h.push('emptyLabel');
+      h.push('emptyLabel'); 
+    }
+    h.push('emptyLabel'); 
+    return h;
+  };
   const fetch = (p) => { setParams(p); return fetchTrainerProfiles(modulesManager, p); };
-  const itemFormatters = () => [
-    (t) => t?.code,
-    (t) => t?.fullName,
-    (t) => formatMessage(`training.trainerType.${t?.trainerType}`),
-    (t) => t?.organization,
-    (t) => t?.email,
-    (t) => (t?.isActive ? formatMessage('yes') : formatMessage('no')),
-    (t) => (
-      <>
-        <Tooltip title={formatMessage('viewDetailsButton.tooltip')}>
-          <IconButton onClick={() => setViewed(t)}><VisibilityIcon /></IconButton>
+  const itemFormatters = () => {
+    const f = [
+      (t) => t?.code,
+      (t) => t?.fullName,
+      (t) => formatMessage(`training.trainerType.${t?.trainerType}`),
+      (t) => t?.organization,
+      (t) => t?.email,
+      (t) => (t?.isActive ? formatMessage('yes') : formatMessage('no')),
+    ];
+    f.push((t) => (
+      <Tooltip title={formatMessage('viewDetailsButton.tooltip')}>
+        <IconButton onClick={() => setViewed(t)}><VisibilityIcon /></IconButton>
+      </Tooltip>
+    ));
+    if (rights.includes(RIGHT_TRAINER_MANAGE)) {
+      f.push((t) => (
+        <Tooltip title={formatMessage('editButton.tooltip')}>
+          <IconButton onClick={() => open(t)}><EditIcon /></IconButton>
         </Tooltip>
-        {rights.includes(RIGHT_TRAINER_MANAGE) && (
-          <Tooltip title={formatMessage('editButton.tooltip')}>
-            <IconButton onClick={() => open(t)}><EditIcon /></IconButton>
-          </Tooltip>
-        )}
-        {rights.includes(RIGHT_TRAINER_MANAGE) && (
-          <Tooltip title={formatMessage('deleteButton.tooltip')}>
-            <IconButton onClick={() => setToDelete(t)}><DeleteIcon /></IconButton>
-          </Tooltip>
-        )}
-      </>
-    ),
-  ];
+      ));
+      f.push((t) => (
+        <Tooltip title={formatMessage('deleteButton.tooltip')}>
+          <IconButton onClick={() => setToDelete(t)}><DeleteIcon /></IconButton>
+        </Tooltip>
+      ));
+    }
+    f.push(() => '');
+    return f;
+  };
 
   return (
     <>
@@ -135,23 +168,25 @@ function TrainerSearcher({
           <Button onClick={() => setViewed(null)}>{formatMessage('training.close')}</Button>
         </DialogActions>
       </Dialog>
-      <Searcher
+      <div className={classes.searcher}>
+        <Searcher
         module="training"
         FilterPane={({ filters, onChangeFilters }) => <Filter filters={filters} onChangeFilters={onChangeFilters} />}
-      fetch={fetch}
-      items={trainerProfiles}
-      itemsPageInfo={trainerProfilesPageInfo}
-      fetchedItems={fetchedTrainers}
-      fetchingItems={fetchingTrainers}
-      errorItems={errorTrainers}
-      tableTitle={formatMessageWithValues('training.trainer.searcherResultsTitle', { trainerProfilesTotalCount })}
-      headers={headers}
-      itemFormatters={itemFormatters}
-      rowsPerPageOptions={ROWS_PER_PAGE_OPTIONS}
-      defaultPageSize={DEFAULT_PAGE_SIZE}
-      rowIdentifier={(t) => t.id}
-      onDoubleClick={(t) => setViewed(t)}
-      />
+        fetch={fetch}
+        items={trainerProfiles}
+        itemsPageInfo={trainerProfilesPageInfo}
+        fetchedItems={fetchedTrainers}
+        fetchingItems={fetchingTrainers}
+        errorItems={errorTrainers}
+        tableTitle={formatMessageWithValues('training.trainer.searcherResultsTitle', { trainerProfilesTotalCount })}
+        headers={headers}
+        itemFormatters={itemFormatters}
+        rowsPerPageOptions={ROWS_PER_PAGE_OPTIONS}
+        defaultPageSize={DEFAULT_PAGE_SIZE}
+        rowIdentifier={(t) => t.id}
+        onDoubleClick={(t) => setViewed(t)}
+        />
+      </div>
     </>
   );
 }

@@ -11,7 +11,7 @@ import {
   TRAINING_ROUTE_TRAINING,
 } from '../constants';
 import {
-  fetchTraining, clearTraining, createTraining, updateTraining, transitionTraining,
+  fetchTraining, clearTraining, createTraining, updateTraining, transitionTraining, decId,
 } from '../actions';
 import TrainingHeadPanel from '../components/TrainingHeadPanel';
 import ConflictBanner from '../components/ConflictBanner';
@@ -81,7 +81,7 @@ function TrainingPage({ trainingUuid }) {
   ));
 
   const hasHardConflict = (trainingConflicts ?? []).some((c) => c.hard);
-  const mandatoryFilled = edited?.code && edited?.title && edited?.startDatetime && edited?.endDatetime;
+  const mandatoryFilled = edited?.title && edited?.startDatetime && edited?.endDatetime;
   const canSave = () => canEditDetails && mandatoryFilled && !hasHardConflict;
 
   const actions = (!isNew ? (STATUS_ACTIONS[edited?.status] || []) : [])
@@ -133,5 +133,7 @@ function TrainingPage({ trainingUuid }) {
   );
 }
 
-const mapStateToProps = (state, props) => ({ trainingUuid: props.match.params.training_uuid });
+const mapStateToProps = (state, props) => ({
+  trainingUuid: props.match.params.training_uuid ? decId(props.match.params.training_uuid) : undefined,
+});
 export default connect(mapStateToProps, null)(TrainingPage);

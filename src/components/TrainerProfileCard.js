@@ -11,8 +11,6 @@ import AccountCircle from '@material-ui/icons/AccountCircle';
 import { useModulesManager, useTranslations } from '@openimis/fe-core';
 import { useProfileCardStyles, ProfileTile } from '../utils/profileCardStyles';
 
-/** Designed read-only presentation of a TrainerProfile — same brand-themed card as
- * the Attendance/Training cards. */
 function TrainerProfileCard({ trainer }) {
   const classes = useProfileCardStyles();
   const modulesManager = useModulesManager();

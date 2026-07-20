@@ -17,6 +17,7 @@ class TrainerHeadPanel extends FormPanel {
   render() {
     const { edited, classes, readOnly } = this.props;
     const t = { ...edited };
+    const isNew = !edited?.id; // code is server-assigned on create, so hide it until it exists
     if (readOnly) return <TrainerProfileCard trainer={edited} />;
     return (
       <>
@@ -29,12 +30,14 @@ class TrainerHeadPanel extends FormPanel {
         </Grid>
         <Divider />
         <Grid container className={classes.item}>
-          <Grid item xs={3} className={classes.item}>
-            <TextInput
-              module="training" label="training.trainer.code" required readOnly={readOnly}
-              value={t?.code} onChange={(v) => this.updateAttribute('code', v)}
-            />
-          </Grid>
+          {!isNew && (
+            <Grid item xs={3} className={classes.item}>
+              <TextInput
+                module="training" label="training.trainer.code" readOnly
+                value={t?.code} onChange={(v) => this.updateAttribute('code', v)}
+              />
+            </Grid>
+          )}
           <Grid item xs={5} className={classes.item}>
             <TextInput
               module="training" label="training.trainer.fullName" required readOnly={readOnly}

@@ -23,7 +23,6 @@ class TrainingHeadPanel extends FormPanel {
       edited, classes, readOnly, intl,
     } = this.props;
     const t = { ...edited };
-    // View mode → designed profile card; edit mode → the details form.
     if (readOnly) return <TrainingProfileCard training={edited} />;
     return (
       <>
@@ -36,17 +35,18 @@ class TrainingHeadPanel extends FormPanel {
         </Grid>
         <Divider />
         <Grid container className={classes.item}>
-          <Grid item xs={3} className={classes.item}>
-            <TextInput
-              module="training"
-              label="training.code"
-              required
-              readOnly={readOnly}
-              value={t?.code}
-              onChange={(v) => this.updateAttribute('code', v)}
-            />
-          </Grid>
-          <Grid item xs={5} className={classes.item}>
+          {t?.code && (
+            <Grid item xs={3} className={classes.item}>
+              <TextInput
+                module="training"
+                label="training.code"
+                readOnly
+                value={t.code}
+                onChange={(v) => this.updateAttribute('code', v)}
+              />
+            </Grid>
+          )}
+          <Grid item xs={t?.code ? 5 : 6} className={classes.item}>
             <TextInput
               module="training"
               label="training.title"
@@ -56,7 +56,7 @@ class TrainingHeadPanel extends FormPanel {
               onChange={(v) => this.updateAttribute('title', v)}
             />
           </Grid>
-          <Grid item xs={4} className={classes.item}>
+          <Grid item xs={t?.code ? 4 : 6} className={classes.item}>
             <TrainingCategoryPicker
               withLabel
               readOnly={readOnly}

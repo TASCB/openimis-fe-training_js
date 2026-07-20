@@ -5,6 +5,7 @@ import { connect, useSelector } from 'react-redux';
 import {
   IconButton, Tooltip, Dialog, DialogContent, DialogActions, Button,
 } from '@material-ui/core';
+import { makeStyles } from '@material-ui/core/styles';
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import DeleteIcon from '@material-ui/icons/Delete';
 
@@ -22,6 +23,26 @@ import TrainingFilter from './TrainingFilter';
 import StatusChip from './StatusChip';
 import TrainingProfileCard from './TrainingProfileCard';
 
+// Columns: code(1) title status start end venue participants(8) view(9) delete(10) spacer(last).
+const useStyles = makeStyles(() => ({
+  searcher: {
+    '& table': { tableLayout: 'fixed', minWidth: '100%' },
+    '& table th, & table td': { whiteSpace: 'nowrap' },
+    '& table th:nth-child(-n+8), & table td:nth-child(-n+8)': { overflow: 'hidden', textOverflow: 'ellipsis' },
+    '& table th:nth-child(1), & table td:nth-child(1)': { width: 130 },
+    '& table th:nth-child(2), & table td:nth-child(2)': { width: 240 },
+    '& table th:nth-child(3), & table td:nth-child(3)': { width: 180 },
+    '& table th:nth-child(4), & table td:nth-child(4)': { width: 110 },
+    '& table th:nth-child(5), & table td:nth-child(5)': { width: 120 },
+    '& table th:nth-child(6), & table td:nth-child(6)': { width: 120 },
+    '& table th:nth-child(7), & table td:nth-child(7)': { width: 170 },
+    '& table th:nth-child(8), & table td:nth-child(8)': { width: 120 },
+    '& table th:nth-child(9), & table td:nth-child(9)': { width: 56 },
+    '& table th:nth-child(10), & table td:nth-child(10)': { width: 56 },
+    '& table th:last-child, & table td:last-child': { width: 32 },
+  },
+}));
+
 function TrainingSearcher({
   fetchTrainings, deleteTraining, journalize, coreConfirm, clearConfirm, confirmed,
   fetchingTrainings, fetchedTrainings, errorTrainings, trainings,
@@ -29,6 +50,7 @@ function TrainingSearcher({
 }) {
   const history = useHistory();
   const intl = useIntl();
+  const classes = useStyles();
   const modulesManager = useModulesManager();
   const { formatMessage, formatMessageWithValues } = useTranslations('training', modulesManager);
   const rights = useSelector((store) => store.core.user.i_user.rights ?? []);
@@ -67,40 +89,55 @@ function TrainingSearcher({
   }, [submittingMutation]);
   useEffect(() => { prevSubmittingRef.current = submittingMutation; });
 
-  const headers = () => [
-    'training.code', 'training.title', 'training.category', 'training.status',
-    'training.startDatetime', 'training.endDatetime', 'training.venue', 'training.participants', 'emptyLabel',
-  ];
-  const sorts = () => [
-    ['code', true], ['title', true], null, ['status', true],
-    ['startDatetime', true], ['endDatetime', true], null, null, null,
-  ];
+  const headers = () => {
+    const h = [
+      'training.code', 'training.title', 'training.category', 'training.status',
+      'training.startDatetime', 'training.endDatetime', 'training.venue', 'training.participants',
+    ];
+    h.push('emptyLabel');
+    if (rights.includes(RIGHT_TRAINING_DELETE)) h.push('emptyLabel'); // delete
+    h.push('emptyLabel'); 
+    return h;
+  };
+  const sorts = () => {
+    const s = [
+      ['code', true], ['title', true], null, ['status', true],
+      ['startDatetime', true], ['endDatetime', true], null, null,
+    ];
+    s.push(null);
+    if (rights.includes(RIGHT_TRAINING_DELETE)) s.push(null);
+    s.push(null); 
+    return s;
+  };
 
   const fetch = (params) => { setQueryParams(params); return fetchTrainings(modulesManager, params); };
 
-  const itemFormatters = () => [
-    (t) => t?.code,
-    (t) => t?.title,
-    (t) => t?.category?.name ?? '',
-    (t) => <StatusChip status={t?.status} />,
-    (t) => (t?.startDatetime ? formatDateFromISO(modulesManager, intl, t.startDatetime) : ''),
-    (t) => (t?.endDatetime ? formatDateFromISO(modulesManager, intl, t.endDatetime) : ''),
-    (t) => t?.venue ?? '',
-    (t) => t?.expectedParticipants ?? '',
-    (t) => (
-      <>
-        <Tooltip title={formatMessage('viewDetailsButton.tooltip')}>
-          <IconButton onClick={() => setViewed(t)}><VisibilityIcon /></IconButton>
+  const itemFormatters = () => {
+    const f = [
+      (t) => t?.code,
+      (t) => t?.title,
+      (t) => t?.category?.name ?? '',
+      (t) => <StatusChip status={t?.status} />,
+      (t) => (t?.startDatetime ? formatDateFromISO(modulesManager, intl, t.startDatetime) : ''),
+      (t) => (t?.endDatetime ? formatDateFromISO(modulesManager, intl, t.endDatetime) : ''),
+      (t) => t?.venue ?? '',
+      (t) => t?.expectedParticipants ?? '',
+    ];
+    f.push((t) => (
+      <Tooltip title={formatMessage('viewDetailsButton.tooltip')}>
+        <IconButton onClick={() => setViewed(t)}><VisibilityIcon /></IconButton>
+      </Tooltip>
+    ));
+    if (rights.includes(RIGHT_TRAINING_DELETE)) {
+      f.push((t) => (![TRAINING_STATUS.CLOSED].includes(t?.status) ? (
+        <Tooltip title={formatMessage('deleteButton.tooltip')}>
+          <IconButton onClick={() => setToDelete(t)}><DeleteIcon /></IconButton>
         </Tooltip>
-        {rights.includes(RIGHT_TRAINING_DELETE)
-          && ![TRAINING_STATUS.CLOSED].includes(t?.status) && (
-          <Tooltip title={formatMessage('deleteButton.tooltip')}>
-            <IconButton onClick={() => setToDelete(t)}><DeleteIcon /></IconButton>
-          </Tooltip>
-        )}
-      </>
-    ),
-  ];
+      ) : null));
+    }
+    f.push(() => ''); // trailing spacer cell
+    return f;
+  };
 
   const filterPane = ({ filters, onChangeFilters }) => (
     <TrainingFilter filters={filters} onChangeFilters={onChangeFilters} />
@@ -119,24 +156,26 @@ function TrainingSearcher({
           <Button onClick={() => setViewed(null)}>{formatMessage('training.close')}</Button>
         </DialogActions>
       </Dialog>
-      <Searcher
-        module="training"
-        FilterPane={filterPane}
-      fetch={fetch}
-      items={trainings}
-      itemsPageInfo={trainingsPageInfo}
-      fetchedItems={fetchedTrainings}
-      fetchingItems={fetchingTrainings}
-      errorItems={errorTrainings}
-      tableTitle={formatMessageWithValues('training.searcherResultsTitle', { trainingsTotalCount })}
-      headers={headers}
-      itemFormatters={itemFormatters}
-      sorts={sorts}
-      rowsPerPageOptions={ROWS_PER_PAGE_OPTIONS}
-      defaultPageSize={DEFAULT_PAGE_SIZE}
-      rowIdentifier={(t) => t.id}
-      onDoubleClick={(t) => setViewed(t)}
-      />
+      <div className={classes.searcher}>
+        <Searcher
+          module="training"
+          FilterPane={filterPane}
+          fetch={fetch}
+          items={trainings}
+          itemsPageInfo={trainingsPageInfo}
+          fetchedItems={fetchedTrainings}
+          fetchingItems={fetchingTrainings}
+          errorItems={errorTrainings}
+          tableTitle={formatMessageWithValues('training.searcherResultsTitle', { trainingsTotalCount })}
+          headers={headers}
+          itemFormatters={itemFormatters}
+          sorts={sorts}
+          rowsPerPageOptions={ROWS_PER_PAGE_OPTIONS}
+          defaultPageSize={DEFAULT_PAGE_SIZE}
+          rowIdentifier={(t) => t.id}
+          onDoubleClick={(t) => setViewed(t)}
+        />
+      </div>
     </>
   );
 }

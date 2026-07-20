@@ -4,11 +4,6 @@ import {
 } from '@material-ui/core';
 import AddIcon from '@material-ui/icons/Add';
 
-/**
- * Simple editor for a list of free-text strings (e.g. learning outcomes, audiences).
- * Items render as deletable chips; a text field + Add (or Enter) appends.
- * Controlled: value is a string[], onChange receives the new array.
- */
 function StringListInput({
   label, value, onChange, readOnly, placeholder,
 }) {

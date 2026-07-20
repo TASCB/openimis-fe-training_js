@@ -9,7 +9,7 @@ import {
   MODULE_NAME, EMPTY_STRING, RIGHT_TRAINER_MANAGE, TRAINING_ROUTE_TRAINER,
 } from '../constants';
 import {
-  fetchTrainerProfile, clearTrainerProfile, createTrainerProfile, updateTrainerProfile,
+  fetchTrainerProfile, clearTrainerProfile, createTrainerProfile, updateTrainerProfile, decId,
 } from '../actions';
 import TrainerHeadPanel from '../components/TrainerHeadPanel';
 
@@ -68,7 +68,7 @@ function TrainerProfilePage({ trainerUuid }) {
     else dispatch(updateTrainerProfile(data, label));
   };
 
-  const canSave = () => canManage && !!edited?.code && !!edited?.fullName && !_.isEqual(trainerProfile, edited);
+  const canSave = () => canManage && !!edited?.fullName && !_.isEqual(trainerProfile, edited);
 
   return (
     <div className={classes.page}>
@@ -95,5 +95,7 @@ function TrainerProfilePage({ trainerUuid }) {
   );
 }
 
-const mapStateToProps = (state, props) => ({ trainerUuid: props.match.params.trainer_uuid });
+const mapStateToProps = (state, props) => ({
+  trainerUuid: props.match.params.trainer_uuid ? decId(props.match.params.trainer_uuid) : undefined,
+});
 export default connect(mapStateToProps, null)(TrainerProfilePage);

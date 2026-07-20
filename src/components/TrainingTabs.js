@@ -9,8 +9,7 @@ import TrainingParticipantsPanel from './TrainingParticipantsPanel';
 import TrainingSessionsPanel from './TrainingSessionsPanel';
 import TrainingFilesPanel from './TrainingFilesPanel';
 
-// Canonical openIMIS tab band (mirrors tasaf_payment workspace / payroll PayrollTab):
-// theme.paper.paper card + theme.table.title band, teal selected tab from core MuiTab theme.
+
 const useStyles = makeStyles((theme) => ({
   paper: theme.paper.paper,
   tableTitle: theme.table.title,
@@ -20,12 +19,7 @@ const useStyles = makeStyles((theme) => ({
   content: { padding: theme.spacing(1) },
 }));
 
-/**
- * Groups the training child surfaces (Trainers & Staff, Participants & Attendance,
- * Materials, Evidence) into a single tabbed card instead of stacked panels.
- * Rendered as one of the Form `Panels`, so it receives the per-surface readOnly
- * flags + trainingId from the Form prop spread.
- */
+
 function TrainingTabs({
   trainingId, assignmentReadOnly, participantReadOnly, filesReadOnly,
 }) {
