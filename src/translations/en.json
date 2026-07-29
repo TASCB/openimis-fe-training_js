@@ -262,6 +262,7 @@
   "training.trainer.organization": "Organization / Department",
   "training.trainer.email": "Email",
   "training.trainer.phone": "Phone",
+  "training.trainer.staffUser": "Staff User",
   "training.trainer.specialization": "Specialization",
   "training.trainer.bio": "Bio / Profile Summary",
   "training.trainer.active": "Active",
