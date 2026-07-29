@@ -1,5 +1,5 @@
 import {
-  graphql, formatMutation, formatPageQueryWithCount, graphqlWithVariables, formatGQLString, baseApiUrl,
+  graphql, formatMutation, formatPageQueryWithCount, graphqlWithVariables, baseApiUrl,
   decodeId,
 } from '@openimis/fe-core';
 import {
@@ -49,7 +49,9 @@ const FILE_PROJECTION = () => [
   'id', 'fileName', 'fileType', 'description', 'fileUrl', 'dateCreated', 'userCreated { username }',
 ];
 
-const str = (k, v) => (v !== undefined && v !== null && v !== '' ? `${k}: "${formatGQLString(v)}"` : '');
+// JSON.stringify (not fe-core formatGQLString, which double-escapes `"` and
+// truncates the query) — see docs/error-fixes and the FE↔BE boundary notes.
+const str = (k, v) => (v !== undefined && v !== null && v !== '' ? `${k}: ${JSON.stringify(String(v))}` : '');
 const raw = (k, v) => (v !== undefined && v !== null && v !== '' ? `${k}: ${v}` : '');
 const list = (k, v) => (Array.isArray(v) && v.length ? `${k}: [${v.map((x) => `"${x}"`).join(',')}]` : '');
 // like list() but emits `[]` for empty arrays so the field can be cleared on update
@@ -144,6 +146,26 @@ export function transitionTraining(action, training, clientMutationLabel, reason
     [REQUEST(ACTION_TYPE.MUTATION), SUCCESS(ACTION_TYPE.TRANSITION_TRAINING), ERROR(ACTION_TYPE.MUTATION)],
     {
       clientMutationId: mutation.clientMutationId, clientMutationLabel, serviceName, requestedDateTime: new Date(),
+    },
+  );
+}
+
+export function rescheduleTraining(training, { startDatetime, endDatetime, reason }, clientMutationLabel) {
+  const input = [
+    str('id', training.id),
+    str('startDatetime', toISO(startDatetime)),
+    str('endDatetime', toISO(endDatetime, true)),
+    str('reason', reason),
+  ].filter(Boolean).join('\n');
+  const mutation = formatMutation('rescheduleTraining', input, clientMutationLabel);
+  return graphql(
+    mutation.payload,
+    [REQUEST(ACTION_TYPE.MUTATION), SUCCESS(ACTION_TYPE.RESCHEDULE_TRAINING), ERROR(ACTION_TYPE.MUTATION)],
+    {
+      clientMutationId: mutation.clientMutationId,
+      clientMutationLabel,
+      serviceName: 'rescheduleTraining',
+      requestedDateTime: new Date(),
     },
   );
 }

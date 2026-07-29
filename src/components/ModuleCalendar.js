@@ -35,6 +35,13 @@ const darken = (hex, amt) => {
   return `rgb(${f(r)},${f(g)},${f(b)})`;
 };
 
+// Events are scheduled by day, so a midnight stamp carries no time information.
+const eventTime = (iso) => {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime()) || (!d.getHours() && !d.getMinutes())) return '';
+  return d.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+};
+
 const DOW_KEYS = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 const sameDay = (a, b) => a.toDateString() === b.toDateString();
 const VIEWS = ['month', 'week', 'agenda'];
@@ -361,9 +368,9 @@ function ModuleCalendar({
                         <span className={classes.eventCode}>{e.code}</span>
                         <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{e.title}</span>
                         <span style={{ color: darken(color(e.status), 0.25), fontSize: 12, fontWeight: 600 }}>{tr(e.status)}</span>
-                        <span style={{ color: '#888', fontSize: 12 }}>
-                          {new Date(e.startDatetime).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
-                        </span>
+                        {!!eventTime(e.startDatetime) && (
+                          <span style={{ color: '#888', fontSize: 12 }}>{eventTime(e.startDatetime)}</span>
+                        )}
                       </div>
                     ))}
                   </div>

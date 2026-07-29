@@ -3,12 +3,14 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import {
   Table, TableHead, TableRow, TableCell, TableBody,
-  IconButton, Button, Tooltip, TextField, Chip,
+  IconButton, Button, Tooltip, Chip,
 } from '@material-ui/core';
 import DeleteIcon from '@material-ui/icons/Delete';
 import CropFreeIcon from '@material-ui/icons/CropFree';
+import { useIntl } from 'react-intl';
 import {
-  TextInput, useModulesManager, useTranslations, journalize,
+  TextInput, PublishedComponent, formatDateFromISO,
+  useModulesManager, useTranslations, journalize,
 } from '@openimis/fe-core';
 import {
   fetchTrainingSessions, saveTrainingSession, deleteTrainingSession,
@@ -17,6 +19,7 @@ import {
   RIGHT_SESSION_CREATE, RIGHT_SESSION_UPDATE, RIGHT_SESSION_DELETE,
 } from '../constants';
 import AttendanceQRDialog from './AttendanceQRDialog';
+import TimeInput from './TimeInput';
 
 const EMPTY = { title: '', sessionDate: '', startTime: '', endTime: '' };
 
@@ -26,6 +29,7 @@ function TrainingSessionsPanel({
   fetchTrainingSessions, saveTrainingSession, deleteTrainingSession, journalize,
 }) {
   const modulesManager = useModulesManager();
+  const intl = useIntl();
   const { formatMessage } = useTranslations('training', modulesManager);
   const [row, setRow] = useState(EMPTY);
   const [qrSessionId, setQrSessionId] = useState(null);
@@ -84,7 +88,9 @@ function TrainingSessionsPanel({
           {(trainingSessions ?? []).map((s) => (
             <TableRow key={s.id}>
               <TableCell>{s.title}</TableCell>
-              <TableCell>{s.sessionDate || '—'}</TableCell>
+              <TableCell>
+                {s.sessionDate ? formatDateFromISO(modulesManager, intl, s.sessionDate) : '—'}
+              </TableCell>
               <TableCell>{s.startTime ? `${s.startTime}${s.endTime ? ` – ${s.endTime}` : ''}` : '—'}</TableCell>
               <TableCell>
                 <Chip
@@ -115,12 +121,23 @@ function TrainingSessionsPanel({
                 <TextInput module="training" value={row.title} onChange={(v) => setRow({ ...row, title: v })} />
               </TableCell>
               <TableCell>
-                <TextField type="date" value={row.sessionDate} onChange={(e) => setRow({ ...row, sessionDate: e.target.value })} InputLabelProps={{ shrink: true }} />
+                <PublishedComponent
+                  pubRef="core.DatePicker"
+                  module="training"
+                  value={row.sessionDate || null}
+                  onChange={(v) => setRow({ ...row, sessionDate: v || '' })}
+                />
               </TableCell>
               <TableCell>
                 <div style={{ display: 'flex', gap: 4 }}>
-                  <TextField type="time" value={row.startTime} onChange={(e) => setRow({ ...row, startTime: e.target.value })} InputLabelProps={{ shrink: true }} style={{ width: 96 }} />
-                  <TextField type="time" value={row.endTime} onChange={(e) => setRow({ ...row, endTime: e.target.value })} InputLabelProps={{ shrink: true }} style={{ width: 96 }} />
+                  <TimeInput
+                    value={row.startTime}
+                    onChange={(v) => setRow({ ...row, startTime: v })}
+                  />
+                  <TimeInput
+                    value={row.endTime}
+                    onChange={(v) => setRow({ ...row, endTime: v })}
+                  />
                 </div>
               </TableCell>
               <TableCell colSpan={2} />

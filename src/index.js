@@ -24,6 +24,7 @@ import TrainingCheckinPublicPage from './pages/TrainingCheckinPublicPage';
 import TrainerPicker from './pickers/TrainerPicker';
 import TrainingCategoryPicker from './pickers/TrainingCategoryPicker';
 import { TrainingStatusPicker } from './pickers/ConstantPickers';
+import TimeInput from './components/TimeInput';
 
 const ROUTE_TRAININGS = 'trainings';
 const ROUTE_TRAINING = 'trainings/training';
@@ -47,6 +48,7 @@ const DEFAULT_CONFIG = {
     { key: 'training.TrainerPicker', ref: TrainerPicker },
     { key: 'training.TrainingCategoryPicker', ref: TrainingCategoryPicker },
     { key: 'training.TrainingStatusPicker', ref: TrainingStatusPicker },
+    { key: 'training.TimeInput', ref: TimeInput },
   ],
   'core.Router': [
     { path: ROUTE_TRAININGS, component: TrainingsPage },

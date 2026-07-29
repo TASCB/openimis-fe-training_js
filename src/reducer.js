@@ -32,6 +32,7 @@ export const ACTION_TYPE = {
   UPDATE_TRAINING: 'TRAINING_UPDATE_TRAINING',
   DELETE_TRAINING: 'TRAINING_DELETE_TRAINING',
   TRANSITION_TRAINING: 'TRAINING_TRANSITION_TRAINING',
+  RESCHEDULE_TRAINING: 'TRAINING_RESCHEDULE_TRAINING',
   CREATE_TRAINER: 'TRAINING_CREATE_TRAINER',
   UPDATE_TRAINER: 'TRAINING_UPDATE_TRAINER',
   DELETE_TRAINER: 'TRAINING_DELETE_TRAINER',
@@ -318,6 +319,8 @@ function reducer(state = STORE_STATE, action) {
       return dispatchMutationResp(state, MUTATION_SERVICE.TRAINING.DELETE, action);
     case SUCCESS(ACTION_TYPE.TRANSITION_TRAINING):
       return dispatchMutationResp(state, action.meta?.serviceName ?? 'transition', action);
+    case SUCCESS(ACTION_TYPE.RESCHEDULE_TRAINING):
+      return dispatchMutationResp(state, 'rescheduleTraining', action);
     case SUCCESS(ACTION_TYPE.CREATE_TRAINER):
       return dispatchMutationResp(state, MUTATION_SERVICE.TRAINER.CREATE, action);
     case SUCCESS(ACTION_TYPE.UPDATE_TRAINER):

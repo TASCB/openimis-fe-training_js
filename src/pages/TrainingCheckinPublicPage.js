@@ -18,6 +18,7 @@ import ConfirmationNumberOutlined from '@material-ui/icons/ConfirmationNumberOut
 import DoneIcon from '@material-ui/icons/Done';
 import { useModulesManager, useTranslations } from '@openimis/fe-core';
 import { MODULE_NAME } from '../constants';
+import { parseDate } from '../utils/dates';
 
 const LOGO = '/front/tasaf-logo.png';
 
@@ -249,8 +250,8 @@ function TrainingCheckinPublicPage(props) {
 
   const s = info?.session || {};
   let dateStr = ''; let chip = '';
-  if (s.date) {
-    const d = new Date(s.date);
+  const d = parseDate(s.date);
+  if (d) {
     dateStr = d.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' });
     chip = d.toLocaleDateString(undefined, { weekday: 'short' }).toUpperCase();
     if (s.startTime) chip += ` · ${s.startTime}`;

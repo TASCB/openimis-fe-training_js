@@ -55,7 +55,7 @@ export const STATUS_COLORS = {
   SCHEDULED: '#7b1fa2',
   ONGOING: '#ed6c02',
   COMPLETED: '#2e7d32',
-  CANCELLED: '#c62828',
+  CANCELLED: '#7f1d1d',
   CLOSED: '#455a64',
 };
 
@@ -81,7 +81,11 @@ export const STATUS_ACTIONS = {
   SUBMITTED: [{ action: 'approve', right: RIGHT_TRAINING_APPROVE }, { action: 'reject', right: RIGHT_TRAINING_APPROVE }],
   REJECTED: [{ action: 'revise', right: RIGHT_TRAINING_UPDATE }],
   APPROVED: [{ action: 'schedule', right: RIGHT_TRAINING_UPDATE }, { action: 'cancel', right: RIGHT_TRAINING_UPDATE }],
-  SCHEDULED: [{ action: 'start', right: RIGHT_TRAINING_UPDATE }, { action: 'cancel', right: RIGHT_TRAINING_UPDATE }],
+  SCHEDULED: [
+    { action: 'start', right: RIGHT_TRAINING_UPDATE },
+    { action: 'reschedule', right: RIGHT_TRAINING_UPDATE, dialog: true },
+    { action: 'cancel', right: RIGHT_TRAINING_UPDATE },
+  ],
   ONGOING: [{ action: 'complete', right: RIGHT_TRAINING_UPDATE }, { action: 'cancel', right: RIGHT_TRAINING_UPDATE }],
   COMPLETED: [{ action: 'close', right: RIGHT_TRAINING_UPDATE }],
   CANCELLED: [],

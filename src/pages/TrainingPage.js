@@ -11,11 +11,13 @@ import {
   TRAINING_ROUTE_TRAINING,
 } from '../constants';
 import {
-  fetchTraining, clearTraining, createTraining, updateTraining, transitionTraining, decId,
+  fetchTraining, clearTraining, createTraining, updateTraining, transitionTraining,
+  rescheduleTraining, decId,
 } from '../actions';
 import TrainingHeadPanel from '../components/TrainingHeadPanel';
 import ConflictBanner from '../components/ConflictBanner';
 import TrainingTabs from '../components/TrainingTabs';
+import RescheduleDialog from '../components/RescheduleDialog';
 
 const useStyles = makeStyles((theme) => ({ page: theme.page }));
 
@@ -33,6 +35,7 @@ function TrainingPage({ trainingUuid }) {
 
   const [edited, setEdited] = useState({ status: TRAINING_STATUS.DRAFT });
   const [resetKey, setResetKey] = useState(0);
+  const [rescheduling, setRescheduling] = useState(false);
   const prev = useRef();
 
   const isNew = !trainingUuid;
@@ -76,9 +79,16 @@ function TrainingPage({ trainingUuid }) {
     else dispatch(updateTraining(data, label));
   };
 
-  const onAction = (action) => dispatch(transitionTraining(
-    action, edited, formatMessageWithValues(`training.action.${action}.mutationLabel`, titleParams(edited)),
-  ));
+  const actionLabel = (action) => formatMessageWithValues(
+    `training.action.${action}.mutationLabel`, titleParams(edited),
+  );
+
+  const onAction = (action) => dispatch(transitionTraining(action, edited, actionLabel(action)));
+
+  const onReschedule = (dates) => {
+    setRescheduling(false);
+    dispatch(rescheduleTraining(edited, dates, actionLabel('reschedule')));
+  };
 
   const hasHardConflict = (trainingConflicts ?? []).some((c) => c.hard);
   const mandatoryFilled = edited?.title && edited?.startDatetime && edited?.endDatetime;
@@ -90,7 +100,11 @@ function TrainingPage({ trainingUuid }) {
       onlyIfNotDirty: true,
       tooltip: formatMessage(`training.action.${a.action}`),
       button: (
-        <Button variant="contained" color="primary" onClick={() => onAction(a.action)}>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={a.dialog ? () => setRescheduling(true) : () => onAction(a.action)}
+        >
           {formatMessage(`training.action.${a.action}`)}
         </Button>
       ),
@@ -128,6 +142,12 @@ function TrainingPage({ trainingUuid }) {
         participantReadOnly={!rights.includes(RIGHT_PARTICIPANT_MANAGE)}
         filesReadOnly={!rights.includes(RIGHT_TRAINING_UPDATE)}
         rights={rights}
+      />
+      <RescheduleDialog
+        training={edited}
+        open={rescheduling}
+        onClose={() => setRescheduling(false)}
+        onConfirm={onReschedule}
       />
     </div>
   );

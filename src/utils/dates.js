@@ -20,6 +20,15 @@ export function toISO(value, endOfDay = false) {
   }
 }
 
+// A bare YYYY-MM-DD is parsed as UTC midnight by spec, which lands on the
+// previous day west of Greenwich. Build it from local parts instead.
+export function parseDate(value) {
+  if (!value) return null;
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(String(value));
+  const d = m ? new Date(+m[1], +m[2] - 1, +m[3]) : new Date(value);
+  return Number.isNaN(d.getTime()) ? null : d;
+}
+
 export function startOfWeek(date = new Date()) {
   const d = new Date(date);
   const day = (d.getDay() + 6) % 7; // Monday=0
