@@ -7,15 +7,22 @@ import {
 } from '@material-ui/core';
 import DeleteIcon from '@material-ui/icons/Delete';
 import {
-  TextInput, useModulesManager, useTranslations, journalize,
+  PublishedComponent, TextInput, useModulesManager, useTranslations, journalize,
 } from '@openimis/fe-core';
+import { userDisplayName } from '../utils/users';
 import {
   fetchTrainingAssignments, saveTrainingAssignment, deleteTrainingAssignment,
 } from '../actions';
 import TrainerPicker from '../pickers/TrainerPicker';
 import { AssignmentRolePicker, AssignmentStatusPicker } from '../pickers/ConstantPickers';
 
-const EMPTY = { trainer: null, role: 'LEAD_TRAINER', status: 'ASSIGNED', notes: '' };
+const EMPTY = {
+  trainer: null,
+  staffUser: null,
+  role: 'LEAD_TRAINER',
+  status: 'ASSIGNED',
+  notes: '',
+};
 
 function TrainingAssignmentsPanel({
   trainingId, assignmentReadOnly: readOnly, trainingAssignments, submittingMutation, mutation,
@@ -42,10 +49,22 @@ function TrainingAssignmentsPanel({
     }
   }, [trainingAssignments]);
 
+  // An assignee is either a trainer profile or a system user — never both, so picking
+  // one clears the other.
+  const pickTrainer = (v) => setRow({ ...row, trainer: v ?? null, staffUser: null });
+  const pickStaffUser = (v) => setRow({ ...row, staffUser: v ?? null, trainer: null });
+
   const add = () => {
-    if (!row.trainer) return;
+    if (!row.trainer && !row.staffUser) return;
     saveTrainingAssignment(
-      { trainingId, trainerId: row.trainer.id, role: row.role, status: row.status, notes: row.notes },
+      {
+        trainingId,
+        trainer: row.trainer,
+        staffUser: row.staffUser,
+        role: row.role,
+        status: row.status,
+        notes: row.notes,
+      },
       formatMessage('training.assignment.add.mutationLabel'),
     );
     setRow(EMPTY);
@@ -58,6 +77,7 @@ function TrainingAssignmentsPanel({
         <TableHead>
           <TableRow>
             <TableCell>{formatMessage('training.assignment.trainer')}</TableCell>
+            <TableCell>{formatMessage('training.assignment.staffUser')}</TableCell>
             <TableCell>{formatMessage('training.assignment.role')}</TableCell>
             <TableCell>{formatMessage('training.assignment.status')}</TableCell>
             <TableCell>{formatMessage('training.assignment.notes')}</TableCell>
@@ -67,7 +87,8 @@ function TrainingAssignmentsPanel({
         <TableBody>
           {(trainingAssignments ?? []).map((a) => (
             <TableRow key={a.id}>
-              <TableCell>{a.trainer ? `${a.trainer.fullName} (${a.trainer.code})` : a.staffUser?.username}</TableCell>
+              <TableCell>{a.trainer ? `${a.trainer.fullName} (${a.trainer.code})` : ''}</TableCell>
+              <TableCell>{userDisplayName(a.staffUser)}</TableCell>
               <TableCell>{formatMessage(`training.role.${a.role}`)}</TableCell>
               <TableCell>{formatMessage(`training.assignmentStatus.${a.status}`)}</TableCell>
               <TableCell>{a.notes}</TableCell>
@@ -83,7 +104,15 @@ function TrainingAssignmentsPanel({
           {!readOnly && (
             <TableRow>
               <TableCell>
-                <TrainerPicker withLabel value={row.trainer} onChange={(v) => setRow({ ...row, trainer: v })} />
+                <TrainerPicker withLabel value={row.trainer} onChange={pickTrainer} />
+              </TableCell>
+              <TableCell>
+                <PublishedComponent
+                  pubRef="admin.UserPicker"
+                  module="training"
+                  value={row.staffUser}
+                  onChange={pickStaffUser}
+                />
               </TableCell>
               <TableCell>
                 <AssignmentRolePicker value={row.role} onChange={(v) => setRow({ ...row, role: v })} />
@@ -95,7 +124,13 @@ function TrainingAssignmentsPanel({
                 <TextInput module="training" value={row.notes} onChange={(v) => setRow({ ...row, notes: v })} />
               </TableCell>
               <TableCell>
-                <Button variant="contained" size="small" color="primary" onClick={add} disabled={!row.trainer}>
+                <Button
+                  variant="contained"
+                  size="small"
+                  color="primary"
+                  onClick={add}
+                  disabled={!row.trainer && !row.staffUser}
+                >
                   {formatMessage('addButton')}
                 </Button>
               </TableCell>

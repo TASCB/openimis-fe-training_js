@@ -15,13 +15,21 @@ function ConflictBanner({
   const modulesManager = useModulesManager();
   const { formatMessage } = useTranslations('training', modulesManager);
 
+  // trainingAssignments is a shared slice holding whichever training was opened last and is never
+  // cleared, so match each row to the training being edited before conflict-checking its trainers.
+  const ownAssignments = useMemo(() => {
+    const editedId = decId(edited?.id);
+    if (!editedId) return [];
+    return (trainingAssignments ?? []).filter((a) => decId(a.training?.id) === editedId);
+  }, [trainingAssignments, edited?.id]);
+
   const trainerIds = useMemo(
-    () => (trainingAssignments ?? []).map((a) => decId(a.trainer?.id)).filter(Boolean),
-    [trainingAssignments],
+    () => ownAssignments.map((a) => decId(a.trainer?.id)).filter(Boolean),
+    [ownAssignments],
   );
   const staffUserIds = useMemo(
-    () => (trainingAssignments ?? []).map((a) => decId(a.staffUser?.id)).filter(Boolean),
-    [trainingAssignments],
+    () => ownAssignments.map((a) => decId(a.staffUser?.id)).filter(Boolean),
+    [ownAssignments],
   );
 
   const debouncedFetch = useMemo(
@@ -34,7 +42,7 @@ function ConflictBanner({
       debouncedFetch({
         startDatetime: toISO(edited.startDatetime),
         endDatetime: toISO(edited.endDatetime, true),
-        trainingId: edited.id ?? null,
+        trainingId: decId(edited.id), // relay global id here; $trainingId is a raw UUID
         venue: edited.venue ?? null,
         locationId: (() => { const d = decId(edited.locationId ?? edited.location?.id); return d ? Number(d) : null; })(),
         trainerIds: trainerIds.length ? trainerIds : null,
@@ -44,7 +52,8 @@ function ConflictBanner({
       clearTrainingConflicts();
     }
   }, [edited?.startDatetime, edited?.endDatetime, edited?.venue, edited?.locationId,
-    trainerIds.length, staffUserIds.length]);
+    // the ids themselves, not their count — swapping one trainer for another must re-check
+    trainerIds.join(), staffUserIds.join()]);
 
   const hard = (trainingConflicts ?? []).filter((c) => c.hard);
   const soft = (trainingConflicts ?? []).filter((c) => !c.hard);

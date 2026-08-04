@@ -4,7 +4,7 @@ import React, {
 } from 'react';
 import { makeStyles } from '@material-ui/styles';
 import {
-  Paper, Typography, Button, IconButton, Tooltip, Popover, Box, Fab,
+  Paper, Typography, Button, IconButton, Popover, Box, Fab,
 } from '@material-ui/core';
 import ChevronLeft from '@material-ui/icons/ChevronLeft';
 import ChevronRight from '@material-ui/icons/ChevronRight';

@@ -12,6 +12,18 @@ import Check from '@material-ui/icons/Check';
 import { useModulesManager, useTranslations, formatDateFromISO } from '@openimis/fe-core';
 import { STATUS_COLORS } from '../constants';
 
+// Region › District › Ward › Village, shown under the PAA it resolves to.
+const locationPath = (location) => {
+  const names = [];
+  for (let node = location; node; node = node.parent) names.unshift(node.name);
+  return names.join(' › ');
+};
+
+const paaExtra = (t, classes) => {
+  const path = locationPath(t.location);
+  return path ? <div className={classes.cellSub}>{path}</div> : null;
+};
+
 const TEAL = '#00695C';
 const TEAL_DK = '#013B33';
 
@@ -43,6 +55,7 @@ const useStyles = makeStyles(() => ({
   cellLabel: { fontFamily: "'DM Mono', monospace", fontSize: 10, letterSpacing: 1, color: '#9aaaa4', textTransform: 'uppercase' },
   cellVal: { fontSize: 15, fontWeight: 600, color: '#1c322d', marginTop: 3 },
   durChip: { fontFamily: "'DM Mono', monospace", fontSize: 10.5, color: '#7c918b', marginLeft: 8, fontWeight: 500 },
+  cellSub: { fontSize: 11.5, fontWeight: 400, color: '#7c918b', marginTop: 2 },
   // overview / sections
   section: { padding: '8px 28px 4px' },
   sectionTitle: { fontFamily: "'DM Mono', monospace", fontSize: 11, letterSpacing: 1, color: TEAL, textTransform: 'uppercase', fontWeight: 500, padding: '16px 0 8px', borderBottom: '1px solid #eef3f1', marginBottom: 12 },
@@ -121,7 +134,7 @@ function TrainingProfileCard({ training }) {
           <Cell icon={<EventOutlined fontSize="small" />} label={formatMessage('training.record.starts')} value={fmtDate(t.startDatetime)} />
           <Cell icon={<EventAvailableOutlined fontSize="small" />} label={formatMessage('training.record.ends')} value={fmtDate(t.endDatetime)} extra={duration && <span className={classes.durChip}>{duration}</span>} />
           <Cell icon={<MeetingRoomOutlined fontSize="small" />} label={formatMessage('training.venue')} value={t.venue} />
-          <Cell icon={<PublicOutlined fontSize="small" />} label={formatMessage('training.participant.location')} value={t.location?.name} />
+          <Cell icon={<PublicOutlined fontSize="small" />} label={formatMessage('training.paaReference')} value={t.paaReference} extra={paaExtra(t, classes)} />
           <Cell icon={<PeopleOutline fontSize="small" />} label={formatMessage('training.expectedParticipants')} value={t.expectedParticipants} />
         </div>
       </div>
