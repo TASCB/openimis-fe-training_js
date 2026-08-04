@@ -27,6 +27,7 @@ export const ACTION_TYPE = {
   SEARCH_EVIDENCE: 'TRAINING_EVIDENCE',
   GET_CONFLICTS: 'TRAINING_CONFLICTS',
   GET_SUMMARY: 'TRAINING_SUMMARY',
+  GET_PAA: 'TRAINING_PAA_FOR_LOCATION',
   GET_CALENDAR: 'TRAINING_CALENDAR',
   CREATE_TRAINING: 'TRAINING_CREATE_TRAINING',
   UPDATE_TRAINING: 'TRAINING_UPDATE_TRAINING',
@@ -99,6 +100,7 @@ const STORE_STATE = {
   fetchingEvidence: false,
   fetchedEvidence: false,
   trainingConflicts: [],
+  paaForLocation: null,
   fetchingConflicts: false,
   trainingSummary: null,
   fetchingSummary: false,
@@ -282,6 +284,15 @@ function reducer(state = STORE_STATE, action) {
       return { ...state, fetchingConflicts: false, trainingConflicts: [] };
     case CLEAR(ACTION_TYPE.GET_CONFLICTS):
       return { ...state, trainingConflicts: [] };
+
+    case REQUEST(ACTION_TYPE.GET_PAA):
+      return { ...state, fetchingPaa: true };
+    case SUCCESS(ACTION_TYPE.GET_PAA):
+      return { ...state, fetchingPaa: false, paaForLocation: action.payload.data.paaForLocation ?? null };
+    case ERROR(ACTION_TYPE.GET_PAA):
+      return { ...state, fetchingPaa: false, paaForLocation: null };
+    case CLEAR(ACTION_TYPE.GET_PAA):
+      return { ...state, paaForLocation: null };
 
     case REQUEST(ACTION_TYPE.GET_SUMMARY):
       return { ...state, fetchingSummary: true, errorSummary: null };

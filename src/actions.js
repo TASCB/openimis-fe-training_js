@@ -8,40 +8,46 @@ import {
 import { ACTION_TYPE } from './reducer';
 import { toISO } from './utils/dates';
 
-const TRAINING_LIST_PROJECTION = () => [
+// Mirrors admin.UserPicker's own projection, so a stored link renders in the picker
+// instead of coming back blank.
+const USER_PROJECTION = 'id username iUser { id otherNames lastName }';
+
+// FlatProjection: the PAA cascade needs the location's ancestors, not just `{ id code name }`.
+const TRAINING_LIST_PROJECTION = (mm) => [
   'id', 'code', 'title', 'status', 'startDatetime', 'endDatetime', 'venue',
   'expectedParticipants', 'paaReference', 'description',
   'learningOutcomes', 'intendedFor',
-  'category { id code name }', 'location { id code name }',
+  'category { id code name }', `location${mm.getProjection('location.Location.FlatProjection')}`,
   'dateCreated', 'dateUpdated', 'userCreated { username }', 'userUpdated { username }', 'version',
 ];
 
-const TRAINING_FULL_PROJECTION = () => [
-  ...TRAINING_LIST_PROJECTION(),
+const TRAINING_FULL_PROJECTION = (mm) => [
+  ...TRAINING_LIST_PROJECTION(mm),
   'jsonExt',
 ];
 
 const TRAINER_PROJECTION = () => [
-  'id', 'code', 'fullName', 'email', 'phone', 'organization', 'trainerType',
-  'specialization', 'bio', 'isActive', 'staffUser { id username }', 'version',
+  'id', 'code', 'fullName', 'gender', 'position { id code name userGroup { id code name } }',
+  'email', 'phone', 'organization', 'trainerType',
+  'specialization', 'bio', 'isActive', `staffUser { ${USER_PROJECTION} }`, 'version',
 ];
 
 const CATEGORY_PROJECTION = () => ['id', 'code', 'name', 'description', 'isActive'];
 
 const ASSIGNMENT_PROJECTION = () => [
   'id', 'role', 'status', 'notes', 'training { id }',
-  'trainer { id code fullName }', 'staffUser { id username }',
+  'trainer { id code fullName }', `staffUser { ${USER_PROJECTION} }`,
 ];
 
 const PARTICIPANT_PROJECTION = () => [
-  'id', 'fullName', 'phone', 'email', 'organization', 'title',
-  'participantType', 'attendanceStatus', 'attendanceRemarks',
-  'location { id name }', 'internalUser { id username }',
+  'id', 'fullName', 'gender', 'phone', 'email', 'organization', 'title',
+  'category { id code name }', 'attendanceStatus', 'attendanceRemarks', 'session { id title }',
+  'location { id name }', 'paaReference', `internalUser { ${USER_PROJECTION} }`,
 ];
 
 const ATTENDANCE_PROJECTION = () => [
-  'id', 'fullName', 'phone', 'organization', 'participantType',
-  'attendanceStatus', 'attendanceRemarks', 'location { id name }',
+  'id', 'fullName', 'gender', 'phone', 'organization', 'category { id code name }',
+  'attendanceStatus', 'attendanceRemarks', 'location { id name }', 'paaReference',
   'training { id code title startDatetime }',
 ];
 
@@ -77,12 +83,12 @@ export const encId = (typeName, v) => {
 };
 
 export function fetchTrainings(modulesManager, params) {
-  const payload = formatPageQueryWithCount('training', params, TRAINING_LIST_PROJECTION());
+  const payload = formatPageQueryWithCount('training', params, TRAINING_LIST_PROJECTION(modulesManager));
   return graphql(payload, ACTION_TYPE.SEARCH_TRAININGS);
 }
 
 export function fetchTraining(modulesManager, params) {
-  const payload = formatPageQueryWithCount('training', params, TRAINING_FULL_PROJECTION());
+  const payload = formatPageQueryWithCount('training', params, TRAINING_FULL_PROJECTION(modulesManager));
   return graphql(payload, ACTION_TYPE.GET_TRAINING);
 }
 
@@ -187,6 +193,8 @@ function formatTrainerGQL(t) {
     str('id', t?.id),
     str('code', t?.code),
     str('fullName', t?.fullName),
+    raw('gender', t?.gender), // GenderInput enum — must go unquoted
+    str('positionId', decId(t?.positionId ?? t?.position?.id)),
     str('email', t?.email),
     str('phone', t?.phone),
     str('organization', t?.organization),
@@ -285,12 +293,14 @@ function formatParticipantGQL(p) {
   return [
     str('id', p?.id),
     str('trainingId', p?.trainingId),
+    str('sessionId', decId(p?.sessionId ?? p?.session?.id)),
     str('fullName', p?.fullName),
+    raw('gender', p?.gender), // GenderInput enum — must go unquoted
     str('phone', p?.phone),
     str('email', p?.email),
     str('organization', p?.organization),
     str('title', p?.title),
-    raw('participantType', p?.participantType),
+    str('categoryId', decId(p?.categoryId ?? p?.category?.id)),
     str('internalUserId', decId(p?.internalUserId ?? p?.internalUser?.id)),
     raw('locationId', decId(p?.locationId ?? p?.location?.id)),
     raw('attendanceStatus', p?.attendanceStatus),
@@ -324,7 +334,7 @@ export function deleteTrainingParticipant(p, clientMutationLabel) {
 // ── Training sessions (per-day + QR self check-in) ──
 const SESSION_PROJECTION = () => [
   'id', 'title', 'sessionDate', 'startTime', 'endTime', 'sequence', 'venue',
-  'registrationToken', 'registrationOpen', 'registrationOpensAt', 'registrationClosesAt',
+  'registrationToken', 'registrationOpen', 'checkinOpen',
 ];
 
 function formatSessionGQL(s) {
@@ -418,6 +428,17 @@ function uploadFile(path, { trainingId, file, description, evidenceType }) {
 
 export const uploadTrainingMaterial = (args) => uploadFile('/training/materials/upload/', args);
 export const uploadTrainingEvidence = (args) => uploadFile('/training/evidence/upload/', args);
+
+// Resolved by the backend: the Zanzibar mapping is configurable in api_etl, not duplicated here.
+export function fetchPaaForLocation(locationId) {
+  return graphqlWithVariables(
+    'query ($locationId: Int!) { paaForLocation(locationId: $locationId) }',
+    { locationId },
+    ACTION_TYPE.GET_PAA,
+  );
+}
+
+export const clearPaaForLocation = () => (dispatch) => dispatch({ type: CLEAR(ACTION_TYPE.GET_PAA) });
 
 export function fetchTrainingConflicts(variables) {
   return graphqlWithVariables(

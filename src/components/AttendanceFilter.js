@@ -8,7 +8,9 @@ import { withTheme, withStyles } from '@material-ui/core/styles';
 import _debounce from 'lodash/debounce';
 import { defaultFilterStyles } from '../utils/styles';
 import { DEFAULT_DEBOUNCE_TIME, EMPTY_STRING, CONTAINS_LOOKUP } from '../constants';
-import { AttendanceStatusPicker, ParticipantTypePicker } from '../pickers/ConstantPickers';
+import { AttendanceStatusPicker, GenderPicker } from '../pickers/ConstantPickers';
+import ParticipantCategoryPicker from '../pickers/ParticipantCategoryPicker';
+import { decId } from '../actions';
 
 function AttendanceFilter({ classes, filters, onChangeFilters }) {
   const modulesManager = useModulesManager();
@@ -47,9 +49,9 @@ function AttendanceFilter({ classes, filters, onChangeFilters }) {
         />
       </Grid>
       <Grid item xs={3} className={classes.item}>
+        {/* No label override — it would break the option keys. docs/07-frontend.md §6. */}
         <AttendanceStatusPicker
           withNull
-          label="training.participant.attendance"
           value={filterValue('attendanceStatus')}
           onChange={(v) => onChangeFilters([{
             id: 'attendanceStatus', value: v, filter: v ? `attendanceStatus: "${v}"` : '',
@@ -57,12 +59,25 @@ function AttendanceFilter({ classes, filters, onChangeFilters }) {
         />
       </Grid>
       <Grid item xs={3} className={classes.item}>
-        <ParticipantTypePicker
-          withNull
-          label="training.participant.type"
-          value={filterValue('participantType')}
+        <ParticipantCategoryPicker
+          withLabel
+          label="training.participant.category"
+          value={filterValue('categoryObj')}
           onChange={(v) => onChangeFilters([{
-            id: 'participantType', value: v, filter: v ? `participantType: "${v}"` : '',
+            // decId: relay global id -> UUID arg.
+            id: 'categoryObj', value: v, filter: v ? `categoryId: "${decId(v.id)}"` : '',
+          }])}
+        />
+      </Grid>
+      <Grid item xs={3} className={classes.item}>
+        <GenderPicker
+          withNull
+          label="training.gender"
+          value={filterValue('gender')}
+          onChange={(v) => onChangeFilters([{
+            // graphene_django types this filter from the model choices, so the value is a
+            // TrainingParticipantGender enum literal — unquoted, unlike the filters above.
+            id: 'gender', value: v, filter: v ? `gender: ${v}` : '',
           }])}
         />
       </Grid>

@@ -31,12 +31,12 @@ function AttendanceSearcher({
   );
 
   const headers = () => [
-    'training.participant.fullName', 'training.attendance.training', 'training.participant.type',
-    'training.participant.organization', 'training.participant.phone',
-    'training.participant.attendance', 'training.participant.location', 'emptyLabel',
+    'training.participant.fullName', 'training.gender', 'training.attendance.training',
+    'training.participant.category', 'training.participant.organization', 'training.participant.phone',
+    'training.participant.attendance', 'training.paaReference', 'emptyLabel',
   ];
   const sorts = () => [
-    ['fullName', true], null, ['participantType', true], ['organization', true],
+    ['fullName', true], ['gender', true], null, ['category__sequence', true], ['organization', true],
     ['phone', true], ['attendanceStatus', true], null, null,
   ];
 
@@ -44,12 +44,15 @@ function AttendanceSearcher({
 
   const itemFormatters = () => [
     (p) => p?.fullName,
+    (p) => (p?.gender ? formatMessage(`training.gender.${p.gender}`) : ''),
     (p) => (p?.training ? `${p.training.code} - ${p.training.title}` : ''),
-    (p) => (p?.participantType ? formatMessage(`training.participantType.${p.participantType}`) : ''),
+    (p) => p?.category?.name ?? '',
     (p) => p?.organization ?? '',
     (p) => p?.phone ?? '',
     (p) => (p?.attendanceStatus ? formatMessage(`training.attendanceStatus.${p.attendanceStatus}`) : ''),
-    (p) => p?.location?.name ?? '',
+    // District on the mainland, island scope in Zanzibar — the reporting unit, not the
+    // raw village/ward the participant happens to be recorded against.
+    (p) => p?.paaReference ?? '',
     (p) => (
       <Tooltip title={formatMessage('viewDetailsButton.tooltip')}>
         <IconButton onClick={() => setViewed(p)}><VisibilityIcon /></IconButton>

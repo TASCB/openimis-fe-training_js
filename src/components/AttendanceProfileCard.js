@@ -8,6 +8,7 @@ import School from '@material-ui/icons/School';
 import Business from '@material-ui/icons/Business';
 import Phone from '@material-ui/icons/Phone';
 import LocationOn from '@material-ui/icons/LocationOn';
+import Public from '@material-ui/icons/Public';
 import Event from '@material-ui/icons/Event';
 import { useModulesManager, useTranslations, formatDateFromISO } from '@openimis/fe-core';
 import { useProfileCardStyles, ProfileTile } from '../utils/profileCardStyles';
@@ -18,7 +19,7 @@ function AttendanceProfileCard({ attendance }) {
   const modulesManager = useModulesManager();
   const { formatMessage } = useTranslations('training', modulesManager);
   const a = attendance || {};
-  const typeLabel = a.participantType ? formatMessage(`training.participantType.${a.participantType}`) : null;
+  const typeLabel = a.category?.name ?? null;
   const statusLabel = a.attendanceStatus ? formatMessage(`training.attendanceStatus.${a.attendanceStatus}`) : null;
   const trainingLabel = a.training ? `${a.training.code} - ${a.training.title}` : null;
 
@@ -39,6 +40,9 @@ function AttendanceProfileCard({ attendance }) {
           <ProfileTile icon={<Event />} label={formatMessage('training.startDatetime')} value={a.training?.startDatetime ? formatDateFromISO(modulesManager, intl, a.training.startDatetime) : null} />
           <ProfileTile icon={<Business />} label={formatMessage('training.participant.organization')} value={a.organization} />
           <ProfileTile icon={<Phone />} label={formatMessage('training.participant.phone')} value={a.phone} />
+          {/* PAA is the reporting unit (district, or island scope in Zanzibar); the raw
+              location below it keeps the ward/village detail. */}
+          <ProfileTile icon={<Public />} label={formatMessage('training.paaReference')} value={a.paaReference} />
           <ProfileTile icon={<LocationOn />} label={formatMessage('training.participant.location')} value={a.location?.name} />
         </Grid>
 

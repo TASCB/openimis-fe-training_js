@@ -33,6 +33,8 @@ export const ROWS_PER_PAGE_OPTIONS = [10, 20, 50, 100];
 export const CONTAINS_LOOKUP = 'Icontains';
 export const EMPTY_STRING = '';
 export const PICKER_LIMIT = 50;
+// The catalogue is a fixed 63; fetch them all. See docs/07-frontend.md §6.
+export const JOB_TITLE_PICKER_LIMIT = 100;
 
 export const TRAINING_STATUS = {
   DRAFT: 'DRAFT',
@@ -59,18 +61,22 @@ export const STATUS_COLORS = {
   CLOSED: '#455a64',
 };
 
-export const TRAINER_TYPE_LIST = ['INTERNAL', 'EXTERNAL'];
+export const TRAINER_TYPE_INTERNAL = 'INTERNAL';
+export const TRAINER_TYPE_LIST = [TRAINER_TYPE_INTERNAL, 'EXTERNAL'];
+
+// Internal trainers are TASAF staff, so their employer is not a per-profile question.
+export const INTERNAL_ORGANIZATION = 'TASAF';
 
 export const ASSIGNMENT_ROLE_LIST = [
   'LEAD_TRAINER', 'ASSISTANT_TRAINER', 'FACILITATOR', 'COORDINATOR', 'OBSERVER', 'SUPPORT_STAFF',
 ];
 export const ASSIGNMENT_STATUS_LIST = ['ASSIGNED', 'CONFIRMED', 'DECLINED', 'REPLACED', 'CANCELLED'];
 
-export const PARTICIPANT_TYPE_LIST = [
-  'TASAF_STAFF', 'PAA_REP', 'CMC_MEMBER', 'LGA_OFFICER', 'ENUMERATOR',
-  'SUPERVISOR', 'COMMUNITY_FACILITATOR', 'TRAINER', 'OTHER',
-];
+// Participant category is query-backed reference data, not a constant list.
 export const ATTENDANCE_STATUS_LIST = ['INVITED', 'CONFIRMED', 'ATTENDED', 'ABSENT', 'REPLACED'];
+
+// Mirrors training.models.Gender.
+export const GENDER_LIST = ['M', 'F'];
 
 export const EVIDENCE_TYPE_LIST = [
   'REPORT', 'ATTENDANCE_SHEET', 'PHOTO', 'SIGNED_FORM', 'EVALUATION_SUMMARY', 'TRAINER_REPORT', 'OTHER',

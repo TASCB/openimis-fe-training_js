@@ -7,25 +7,43 @@ import {
 } from '@material-ui/core';
 import DeleteIcon from '@material-ui/icons/Delete';
 import {
-  TextInput, useModulesManager, useTranslations, journalize,
+  PublishedComponent, SelectInput, TextInput, useModulesManager, useTranslations, journalize,
 } from '@openimis/fe-core';
+import { userDisplayName } from '../utils/users';
 import {
-  fetchTrainingParticipants, saveTrainingParticipant, deleteTrainingParticipant,
+  fetchTrainingParticipants, fetchTrainingSessions, saveTrainingParticipant,
+  deleteTrainingParticipant, decId,
 } from '../actions';
-import { ParticipantTypePicker, AttendanceStatusPicker } from '../pickers/ConstantPickers';
+import { AttendanceStatusPicker, GenderPicker } from '../pickers/ConstantPickers';
+import ParticipantCategoryPicker from '../pickers/ParticipantCategoryPicker';
 
-const EMPTY = { fullName: '', participantType: 'TASAF_STAFF', attendanceStatus: 'INVITED', organization: '', phone: '' };
+const EMPTY = {
+  fullName: '',
+  sessionId: '',
+  internalUser: null,
+  gender: null,
+  category: null,
+  attendanceStatus: 'INVITED',
+  organization: '',
+  phone: '',
+};
 
 function TrainingParticipantsPanel({
-  trainingId, participantReadOnly: readOnly, trainingParticipants, submittingMutation, mutation,
-  fetchTrainingParticipants, saveTrainingParticipant, deleteTrainingParticipant, journalize,
+  trainingId, participantReadOnly: readOnly, trainingParticipants, trainingSessions,
+  submittingMutation, mutation, fetchTrainingParticipants, fetchTrainingSessions,
+  saveTrainingParticipant, deleteTrainingParticipant, journalize,
 }) {
   const modulesManager = useModulesManager();
   const { formatMessage } = useTranslations('training', modulesManager);
   const [row, setRow] = useState(EMPTY);
   const prev = useRef();
 
-  useEffect(() => { if (trainingId) fetchTrainingParticipants(trainingId); }, [trainingId]);
+  useEffect(() => {
+    if (trainingId) {
+      fetchTrainingParticipants(trainingId);
+      fetchTrainingSessions(trainingId);
+    }
+  }, [trainingId]);
   useEffect(() => {
     if (prev.current && !submittingMutation) {
       journalize(mutation);
@@ -34,22 +52,51 @@ function TrainingParticipantsPanel({
   }, [submittingMutation]);
   useEffect(() => { prev.current = submittingMutation; });
 
+  const pickInternalUser = (v) => setRow({
+    ...row,
+    internalUser: v ?? null,
+    fullName: row.fullName || userDisplayName(v),
+  });
+
   const add = () => {
     if (!row.fullName) return;
     saveTrainingParticipant({ ...row, trainingId }, formatMessage('training.participant.add.mutationLabel'));
     setRow(EMPTY);
   };
-  const updateAttendance = (p, attendanceStatus) => saveTrainingParticipant(
-    { id: p.id, trainingId, attendanceStatus }, formatMessage('training.participant.update.mutationLabel'),
+  // Partial update — the mutation only touches the fields it is given.
+  const updateField = (p, patch) => saveTrainingParticipant(
+    { id: p.id, trainingId, ...patch }, formatMessage('training.participant.update.mutationLabel'),
   );
   const remove = (p) => deleteTrainingParticipant(p, formatMessage('training.participant.delete.mutationLabel'));
 
+  // Which register a new row lands in. Blank = a whole-training entry, which is what
+  // manual entries have always been; a session makes it that day's attendance register.
+  const sessionOptions = [
+    { value: '', label: formatMessage('training.participant.wholeTraining') },
+    ...(trainingSessions ?? []).map((s) => ({ value: s.id, label: s.title })),
+  ];
+
   return (
-    <Table size="small">
+    <>
+      {!readOnly && sessionOptions.length > 1 && (
+        <div style={{ maxWidth: 320, padding: '8px 0 4px' }}>
+          <SelectInput
+            module="training"
+            label="training.participant.addToSession"
+            options={sessionOptions}
+            value={row.sessionId}
+            onChange={(v) => setRow({ ...row, sessionId: v ?? '' })}
+          />
+        </div>
+      )}
+      <Table size="small">
         <TableHead>
           <TableRow>
             <TableCell>{formatMessage('training.participant.fullName')}</TableCell>
-            <TableCell>{formatMessage('training.participant.type')}</TableCell>
+            <TableCell>{formatMessage('training.participant.internalUser')}</TableCell>
+            <TableCell>{formatMessage('training.session')}</TableCell>
+            <TableCell>{formatMessage('training.gender')}</TableCell>
+            <TableCell>{formatMessage('training.participant.category')}</TableCell>
             <TableCell>{formatMessage('training.participant.organization')}</TableCell>
             <TableCell>{formatMessage('training.participant.phone')}</TableCell>
             <TableCell>{formatMessage('training.participant.attendance')}</TableCell>
@@ -60,14 +107,32 @@ function TrainingParticipantsPanel({
           {(trainingParticipants ?? []).map((p) => (
             <TableRow key={p.id}>
               <TableCell>{p.fullName}</TableCell>
-              <TableCell>{formatMessage(`training.participantType.${p.participantType}`)}</TableCell>
+              <TableCell>{userDisplayName(p.internalUser)}</TableCell>
+              <TableCell>{p.session?.title ?? ''}</TableCell>
+              <TableCell>
+                {/* Editable inline so historical rows, which all have a null gender, can be filled in. */}
+                <GenderPicker
+                  withNull
+                  readOnly={readOnly}
+                  value={p.gender}
+                  onChange={(v) => updateField(p, { gender: v })}
+                />
+              </TableCell>
+              <TableCell>
+                {/* Inline: rows migrated off the old enum have no category. */}
+                <ParticipantCategoryPicker
+                  readOnly={readOnly}
+                  value={p.category}
+                  onChange={(v) => updateField(p, { categoryId: decId(v?.id) })}
+                />
+              </TableCell>
               <TableCell>{p.organization}</TableCell>
               <TableCell>{p.phone}</TableCell>
               <TableCell>
                 <AttendanceStatusPicker
                   readOnly={readOnly}
                   value={p.attendanceStatus}
-                  onChange={(v) => updateAttendance(p, v)}
+                  onChange={(v) => updateField(p, { attendanceStatus: v })}
                 />
               </TableCell>
               <TableCell>
@@ -85,7 +150,23 @@ function TrainingParticipantsPanel({
                 <TextInput module="training" value={row.fullName} onChange={(v) => setRow({ ...row, fullName: v })} />
               </TableCell>
               <TableCell>
-                <ParticipantTypePicker value={row.participantType} onChange={(v) => setRow({ ...row, participantType: v })} />
+                {/* Picking a system user fills the name so staff attendees don't have to be
+                    retyped, but never overwrites a name already entered by hand. */}
+                <PublishedComponent
+                  pubRef="admin.UserPicker"
+                  module="training"
+                  value={row.internalUser}
+                  onChange={pickInternalUser}
+                />
+              </TableCell>
+              <TableCell>
+                {sessionOptions.find((o) => o.value === row.sessionId)?.label ?? ''}
+              </TableCell>
+              <TableCell>
+                <GenderPicker withNull value={row.gender} onChange={(v) => setRow({ ...row, gender: v })} />
+              </TableCell>
+              <TableCell>
+                <ParticipantCategoryPicker value={row.category} onChange={(v) => setRow({ ...row, category: v })} />
               </TableCell>
               <TableCell>
                 <TextInput module="training" value={row.organization} onChange={(v) => setRow({ ...row, organization: v })} />
@@ -105,17 +186,23 @@ function TrainingParticipantsPanel({
           )}
         </TableBody>
       </Table>
+    </>
   );
 }
 
 const mapStateToProps = (state) => ({
   trainingParticipants: state.training.trainingParticipants,
+  trainingSessions: state.training.trainingSessions,
   submittingMutation: state.training.submittingMutation,
   mutation: state.training.mutation,
 });
 const mapDispatchToProps = (dispatch) => bindActionCreators(
   {
-    fetchTrainingParticipants, saveTrainingParticipant, deleteTrainingParticipant, journalize,
+    fetchTrainingParticipants,
+    fetchTrainingSessions,
+    saveTrainingParticipant,
+    deleteTrainingParticipant,
+    journalize,
   }, dispatch,
 );
 
