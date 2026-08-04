@@ -5,8 +5,8 @@ import {
 } from '@openimis/fe-core';
 import { JOB_TITLE_PICKER_LIMIT } from '../constants';
 
-// The 63 RBAC-catalogue job titles, ordered by the catalogue's serial number.
-// See docs/REFERENCE_DATA.md §4 and docs/07-frontend.md §6.
+// The 63 RBAC-catalogue job titles, ordered by the catalogue's serial number. Options
+// carry the directorate code because fe-core's Autocomplete does not forward `groupBy`.
 function JobTitlePicker({
   multiple, required, readOnly, value, onChange, label, withLabel = false, filterSelectedOptions,
 }) {
