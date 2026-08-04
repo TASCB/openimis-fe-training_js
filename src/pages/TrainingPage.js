@@ -18,6 +18,7 @@ import TrainingHeadPanel from '../components/TrainingHeadPanel';
 import ConflictBanner from '../components/ConflictBanner';
 import TrainingTabs from '../components/TrainingTabs';
 import RescheduleDialog from '../components/RescheduleDialog';
+import { isPaaComplete } from '../utils/paa';
 
 const useStyles = makeStyles((theme) => ({ page: theme.page }));
 
@@ -91,7 +92,8 @@ function TrainingPage({ trainingUuid }) {
   };
 
   const hasHardConflict = (trainingConflicts ?? []).some((c) => c.hard);
-  const mandatoryFilled = edited?.title && edited?.startDatetime && edited?.endDatetime;
+  const mandatoryFilled = edited?.title && edited?.startDatetime && edited?.endDatetime
+    && isPaaComplete(edited?.location);
   const canSave = () => canEditDetails && mandatoryFilled && !hasHardConflict;
 
   const actions = (!isNew ? (STATUS_ACTIONS[edited?.status] || []) : [])

@@ -10,6 +10,8 @@ import { TrainingStatusPicker } from '../pickers/ConstantPickers';
 import TrainingCategoryPicker from '../pickers/TrainingCategoryPicker';
 import TrainingProfileCard from './TrainingProfileCard';
 import StringListInput from './StringListInput';
+import PaaLocationInput from './PaaLocationInput';
+import PaaReadout from './PaaReadout';
 
 const styles = (theme) => ({
   tableTitle: theme.table.title,
@@ -115,24 +117,17 @@ class TrainingHeadPanel extends FormPanel {
               onChange={(v) => this.updateAttribute('expectedParticipants', v ?? null)}
             />
           </Grid>
-          <Grid item xs={4} className={classes.item}>
-            <PublishedComponent
-              pubRef="location.LocationPicker"
+          <Grid item xs={12} className={classes.item}>
+            <Typography variant="caption" color="textSecondary">
+              <FormattedMessage module="training" id="training.paaLocation" />
+            </Typography>
+            <PaaLocationInput
               readOnly={readOnly}
               value={t?.location}
               onChange={(v) => this.updateAttributes({ location: v, locationId: v?.id ?? null })}
             />
           </Grid>
-          <Grid item xs={4} className={classes.item}>
-            <TextInput
-              module="training"
-              label="training.paaReference"
-              readOnly={readOnly}
-              value={t?.paaReference}
-              onChange={(v) => this.updateAttribute('paaReference', v)}
-            />
-          </Grid>
-          <Grid item xs={4} className={classes.item}>
+          <Grid item xs={6} className={classes.item}>
             <TrainingStatusPicker
               required
               readOnly
@@ -141,6 +136,9 @@ class TrainingHeadPanel extends FormPanel {
               value={t?.status}
               onChange={(v) => this.updateAttribute('status', v)}
             />
+          </Grid>
+          <Grid item xs={6} className={classes.item}>
+            <PaaReadout location={t?.location} />
           </Grid>
           <Grid item xs={6} className={classes.item}>
             <StringListInput
