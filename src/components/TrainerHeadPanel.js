@@ -3,9 +3,12 @@ import { injectIntl } from 'react-intl';
 import { Divider, Grid, Typography } from '@material-ui/core';
 import { withStyles, withTheme } from '@material-ui/core/styles';
 import {
-  FormattedMessage, FormPanel, TextInput, withModulesManager,
+  FormattedMessage, FormPanel, PublishedComponent, TextInput, withModulesManager, formatMessage,
 } from '@openimis/fe-core';
-import { TrainerTypePicker } from '../pickers/ConstantPickers';
+import { TrainerTypePicker, GenderPicker } from '../pickers/ConstantPickers';
+import { INTERNAL_ORGANIZATION, TRAINER_TYPE_INTERNAL } from '../constants';
+import JobTitlePicker from '../pickers/JobTitlePicker';
+import { userDisplayName } from '../utils/users';
 import TrainerProfileCard from './TrainerProfileCard';
 
 const styles = (theme) => ({
@@ -14,10 +17,29 @@ const styles = (theme) => ({
 });
 
 class TrainerHeadPanel extends FormPanel {
+  // Clears the other mode's fields; see docs/07-frontend.md §7.
+  onTypeChange = (trainerType) => {
+    if (trainerType === TRAINER_TYPE_INTERNAL) {
+      this.updateAttributes({ trainerType, organization: INTERNAL_ORGANIZATION });
+    } else {
+      this.updateAttributes({ trainerType, staffUser: null, organization: null });
+    }
+  };
+
+  // The picker is the name field for internal trainers; full_name stays the stored name.
+  onStaffUserChange = (staffUser) => this.updateAttributes({
+    staffUser: staffUser ?? null,
+    fullName: userDisplayName(staffUser),
+    organization: INTERNAL_ORGANIZATION,
+  });
+
   render() {
-    const { edited, classes, readOnly } = this.props;
+    const {
+      edited, classes, readOnly, intl,
+    } = this.props;
     const t = { ...edited };
     const isNew = !edited?.id; // code is server-assigned on create, so hide it until it exists
+    const isInternal = (t?.trainerType ?? TRAINER_TYPE_INTERNAL) === TRAINER_TYPE_INTERNAL;
     if (readOnly) return <TrainerProfileCard trainer={edited} />;
     return (
       <>
@@ -38,16 +60,44 @@ class TrainerHeadPanel extends FormPanel {
               />
             </Grid>
           )}
+          {/* Type decides how name and organization are captured — docs/07-frontend.md §7. */}
+          <Grid item xs={4} className={classes.item}>
+            <TrainerTypePicker
+              readOnly={readOnly} value={t?.trainerType ?? TRAINER_TYPE_INTERNAL}
+              onChange={this.onTypeChange}
+            />
+          </Grid>
           <Grid item xs={5} className={classes.item}>
-            <TextInput
-              module="training" label="training.trainer.fullName" required readOnly={readOnly}
-              value={t?.fullName} onChange={(v) => this.updateAttribute('fullName', v)}
+            {isInternal ? (
+              <PublishedComponent
+                pubRef="admin.UserPicker"
+                module="training"
+                label={formatMessage(intl, 'training', 'training.trainer.fullName')}
+                required
+                readOnly={readOnly}
+                value={t?.staffUser}
+                onChange={this.onStaffUserChange}
+              />
+            ) : (
+              <TextInput
+                module="training" label="training.trainer.fullName" required readOnly={readOnly}
+                value={t?.fullName} onChange={(v) => this.updateAttribute('fullName', v)}
+              />
+            )}
+          </Grid>
+          <Grid item xs={3} className={classes.item}>
+            {/* No label override — it would break the option keys. docs/07-frontend.md §6. */}
+            <GenderPicker
+              withNull readOnly={readOnly}
+              value={t?.gender} onChange={(v) => this.updateAttribute('gender', v)}
             />
           </Grid>
           <Grid item xs={4} className={classes.item}>
-            <TrainerTypePicker
-              readOnly={readOnly} value={t?.trainerType}
-              onChange={(v) => this.updateAttribute('trainerType', v)}
+            {/* From the RBAC catalogue, not typed — docs/REFERENCE_DATA.md §4. */}
+            <JobTitlePicker
+              withLabel readOnly={readOnly}
+              label={formatMessage(intl, 'training', 'training.trainer.position')}
+              value={t?.position} onChange={(v) => this.updateAttribute('position', v)}
             />
           </Grid>
           <Grid item xs={4} className={classes.item}>
@@ -63,9 +113,12 @@ class TrainerHeadPanel extends FormPanel {
             />
           </Grid>
           <Grid item xs={4} className={classes.item}>
+            {/* Internal trainers share one organization, so it is filled and locked. */}
             <TextInput
-              module="training" label="training.trainer.organization" readOnly={readOnly}
-              value={t?.organization} onChange={(v) => this.updateAttribute('organization', v)}
+              module="training" label="training.trainer.organization"
+              readOnly={readOnly || isInternal}
+              value={isInternal ? INTERNAL_ORGANIZATION : (t?.organization ?? '')}
+              onChange={(v) => this.updateAttribute('organization', v)}
             />
           </Grid>
           <Grid item xs={6} className={classes.item}>
