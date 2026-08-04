@@ -20,6 +20,7 @@ import {
 } from '../constants';
 import AttendanceQRDialog from './AttendanceQRDialog';
 import TimeInput from './TimeInput';
+import { qrStateKey } from '../utils/checkin';
 
 const EMPTY = { title: '', sessionDate: '', startTime: '', endTime: '' };
 
@@ -95,8 +96,8 @@ function TrainingSessionsPanel({
               <TableCell>
                 <Chip
                   size="small"
-                  color={s.registrationOpen ? 'primary' : 'default'}
-                  label={formatMessage(s.registrationOpen ? 'training.session.qr.open' : 'training.session.qr.closed')}
+                  color={s.checkinOpen ? 'primary' : 'default'}
+                  label={formatMessage(qrStateKey(s))}
                 />
               </TableCell>
               <TableCell align="center">

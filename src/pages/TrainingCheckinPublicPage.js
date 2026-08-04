@@ -17,7 +17,7 @@ import PlaceOutlined from '@material-ui/icons/PlaceOutlined';
 import ConfirmationNumberOutlined from '@material-ui/icons/ConfirmationNumberOutlined';
 import DoneIcon from '@material-ui/icons/Done';
 import { useModulesManager, useTranslations } from '@openimis/fe-core';
-import { MODULE_NAME } from '../constants';
+import { MODULE_NAME, GENDER_LIST } from '../constants';
 import { parseDate } from '../utils/dates';
 
 const LOGO = '/front/tasaf-logo.png';
@@ -430,7 +430,8 @@ function TrainingCheckinPublicPage(props) {
                     <>
                       <div className={classes.backdrop} onClick={() => setGenderOpen(false)} />
                       <div className={classes.menu}>
-                        {[['', 'training.checkin.selectPh'], ['M', 'training.checkin.gender.M'], ['F', 'training.checkin.gender.F']].map(([val, key]) => (
+                        {[['', 'training.checkin.selectPh'],
+                          ...GENDER_LIST.map((g) => [g, `training.checkin.gender.${g}`])].map(([val, key]) => (
                           <div
                             key={val || 'none'}
                             className={`${classes.menuItem} ${form.gender === val ? classes.menuItemSel : ''}`}

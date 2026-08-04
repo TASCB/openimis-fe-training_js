@@ -10,6 +10,7 @@ import Print from '@material-ui/icons/Print';
 import { useModulesManager, useTranslations } from '@openimis/fe-core';
 import { MODULE_NAME } from '../constants';
 import { fetchSessionCheckinCount } from '../actions';
+import { qrStateKey } from '../utils/checkin';
 
 // Public check-in URL (app is served under /front).
 const checkinUrl = (token) => `${window.location.origin}/front/training/checkin/${token}`;
@@ -63,12 +64,17 @@ function AttendanceQRDialog({
           {canToggle && session && (
             <FormControlLabel
               control={<Switch checked={!!session.registrationOpen} onChange={() => onToggle(session)} color="primary" />}
-              label={formatMessage(session.registrationOpen ? 'training.session.qr.open' : 'training.session.qr.closed')}
+              label={formatMessage(qrStateKey(session))}
             />
           )}
-          {!session?.registrationOpen && (
+          {!session?.checkinOpen && (
             <Typography variant="caption" color="error" style={{ textAlign: 'center' }}>
               {formatMessage('training.session.qr.closedHint')}
+            </Typography>
+          )}
+          {session?.checkinOpen && !session?.registrationOpen && (
+            <Typography variant="caption" color="textSecondary" style={{ textAlign: 'center' }}>
+              {formatMessage('training.session.qr.openAutoHint')}
             </Typography>
           )}
           <Typography variant="body2" color="textSecondary" style={{ marginTop: 8 }}>
