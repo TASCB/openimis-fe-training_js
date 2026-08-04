@@ -33,7 +33,7 @@ export const ROWS_PER_PAGE_OPTIONS = [10, 20, 50, 100];
 export const CONTAINS_LOOKUP = 'Icontains';
 export const EMPTY_STRING = '';
 export const PICKER_LIMIT = 50;
-// The catalogue is a fixed 63; fetch them all. See docs/07-frontend.md §6.
+// The catalogue is a fixed 63; fetch them all.
 export const JOB_TITLE_PICKER_LIMIT = 100;
 
 export const TRAINING_STATUS = {

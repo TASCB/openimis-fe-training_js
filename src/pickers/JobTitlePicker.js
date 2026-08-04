@@ -6,7 +6,6 @@ import {
 import { JOB_TITLE_PICKER_LIMIT } from '../constants';
 
 // The 63 RBAC-catalogue job titles, ordered by the catalogue's serial number.
-// See docs/REFERENCE_DATA.md §4 and docs/07-frontend.md §6.
 function JobTitlePicker({
   multiple, required, readOnly, value, onChange, label, withLabel = false, filterSelectedOptions,
 }) {

@@ -6,7 +6,6 @@ import {
 import { PICKER_LIMIT } from '../constants';
 
 // Configurable reference data, ordered down the governance ladder by `sequence`.
-// See docs/REFERENCE_DATA.md §2.
 function ParticipantCategoryPicker({
   multiple, required, readOnly, value, onChange, label, withLabel = false, filterSelectedOptions,
 }) {

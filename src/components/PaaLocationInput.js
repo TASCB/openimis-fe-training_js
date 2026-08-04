@@ -5,7 +5,6 @@ import { locationLevels } from '../utils/paa';
 
 // PAA cascade: Region → District (mandatory) → Ward → Village (optional), emitting the deepest
 // level chosen. Not `location.DetailedLocation`, which only fires onChange at village level.
-// See docs/PAA_LOCATION.md.
 function PaaLocationInput({
   value, onChange, readOnly, required = true,
 }) {

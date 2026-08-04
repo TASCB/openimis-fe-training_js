@@ -17,7 +17,7 @@ const styles = (theme) => ({
 });
 
 class TrainerHeadPanel extends FormPanel {
-  // Clears the other mode's fields; see docs/07-frontend.md §7.
+  // Clears the other mode's fields.
   onTypeChange = (trainerType) => {
     if (trainerType === TRAINER_TYPE_INTERNAL) {
       this.updateAttributes({ trainerType, organization: INTERNAL_ORGANIZATION });
@@ -60,7 +60,7 @@ class TrainerHeadPanel extends FormPanel {
               />
             </Grid>
           )}
-          {/* Type decides how name and organization are captured — docs/07-frontend.md §7. */}
+          {/* Type decides how name and organization are captured. */}
           <Grid item xs={4} className={classes.item}>
             <TrainerTypePicker
               readOnly={readOnly} value={t?.trainerType ?? TRAINER_TYPE_INTERNAL}
@@ -86,14 +86,14 @@ class TrainerHeadPanel extends FormPanel {
             )}
           </Grid>
           <Grid item xs={3} className={classes.item}>
-            {/* No label override — it would break the option keys. docs/07-frontend.md §6. */}
+            {/* No label override — it would break the option keys. */}
             <GenderPicker
               withNull readOnly={readOnly}
               value={t?.gender} onChange={(v) => this.updateAttribute('gender', v)}
             />
           </Grid>
           <Grid item xs={4} className={classes.item}>
-            {/* From the RBAC catalogue, not typed — docs/REFERENCE_DATA.md §4. */}
+            {/* From the RBAC catalogue, not typed. */}
             <JobTitlePicker
               withLabel readOnly={readOnly}
               label={formatMessage(intl, 'training', 'training.trainer.position')}

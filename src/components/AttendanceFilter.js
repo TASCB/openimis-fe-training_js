@@ -49,7 +49,7 @@ function AttendanceFilter({ classes, filters, onChangeFilters }) {
         />
       </Grid>
       <Grid item xs={3} className={classes.item}>
-        {/* No label override — it would break the option keys. docs/07-frontend.md §6. */}
+        {/* No label override — it would break the option keys. */}
         <AttendanceStatusPicker
           withNull
           value={filterValue('attendanceStatus')}

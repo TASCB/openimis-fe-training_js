@@ -56,7 +56,7 @@ const FILE_PROJECTION = () => [
 ];
 
 // JSON.stringify (not fe-core formatGQLString, which double-escapes `"` and
-// truncates the query) — see docs/error-fixes and the FE↔BE boundary notes.
+// truncates the query).
 const str = (k, v) => (v !== undefined && v !== null && v !== '' ? `${k}: ${JSON.stringify(String(v))}` : '');
 const raw = (k, v) => (v !== undefined && v !== null && v !== '' ? `${k}: ${v}` : '');
 const list = (k, v) => (Array.isArray(v) && v.length ? `${k}: [${v.map((x) => `"${x}"`).join(',')}]` : '');
