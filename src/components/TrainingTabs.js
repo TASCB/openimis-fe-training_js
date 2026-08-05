@@ -21,7 +21,7 @@ const useStyles = makeStyles((theme) => ({
 
 
 function TrainingTabs({
-  trainingId, assignmentReadOnly, participantReadOnly, filesReadOnly,
+  trainingId, assignmentReadOnly, participantReadOnly, filesReadOnly, edited,
 }) {
   const classes = useStyles();
   const modulesManager = useModulesManager();
@@ -40,7 +40,11 @@ function TrainingTabs({
       key: 'participants',
       label: 'training.participants.title',
       render: () => (
-        <TrainingParticipantsPanel trainingId={trainingId} participantReadOnly={participantReadOnly} />
+        <TrainingParticipantsPanel
+          trainingId={trainingId}
+          participantReadOnly={participantReadOnly}
+          levelCode={edited?.level?.code}
+        />
       ),
     },
     ...(rights.includes(RIGHT_SESSION_SEARCH) ? [{

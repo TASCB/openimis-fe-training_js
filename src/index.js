@@ -25,6 +25,7 @@ import TrainerPicker from './pickers/TrainerPicker';
 import TrainingCategoryPicker from './pickers/TrainingCategoryPicker';
 import ParticipantCategoryPicker from './pickers/ParticipantCategoryPicker';
 import JobTitlePicker from './pickers/JobTitlePicker';
+import TrainingLevelPicker from './pickers/TrainingLevelPicker';
 import { TrainingStatusPicker } from './pickers/ConstantPickers';
 import TimeInput from './components/TimeInput';
 
@@ -51,6 +52,7 @@ const DEFAULT_CONFIG = {
     { key: 'training.TrainingCategoryPicker', ref: TrainingCategoryPicker },
     { key: 'training.ParticipantCategoryPicker', ref: ParticipantCategoryPicker },
     { key: 'training.JobTitlePicker', ref: JobTitlePicker },
+    { key: 'training.TrainingLevelPicker', ref: TrainingLevelPicker },
     { key: 'training.TrainingStatusPicker', ref: TrainingStatusPicker },
     { key: 'training.TimeInput', ref: TimeInput },
   ],

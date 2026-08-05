@@ -297,5 +297,9 @@
   "training.calendar.sourceLegend": "Activity source",
   "training.calendar.source.TRAINING": "Training",
   "training.calendar.source.COORDINATION": "Coordination",
-  "training.calendar.source.COMMUNICATIONS": "Communications"
+  "training.calendar.source.COMMUNICATIONS": "Communications",
+  "training.levelPicker": "Training level",
+  "training.level": "Training level",
+  "training.level.implementationLocation": "Implementation location",
+  "training.level.reportingApplication": "Reporting application"
 }

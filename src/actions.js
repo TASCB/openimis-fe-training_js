@@ -15,7 +15,8 @@ const TRAINING_LIST_PROJECTION = (mm) => [
   'id', 'code', 'title', 'status', 'startDatetime', 'endDatetime', 'venue',
   'expectedParticipants', 'paaReference', 'description',
   'learningOutcomes', 'intendedFor',
-  'category { id code name }', `location${mm.getProjection('location.Location.FlatProjection')}`,
+  'category { id code name }', 'level { id code name implementationLocation reportingApplication }',
+  `location${mm.getProjection('location.Location.FlatProjection')}`,
   'dateCreated', 'dateUpdated', 'userCreated { username }', 'userUpdated { username }', 'version',
 ];
 
@@ -94,6 +95,7 @@ function formatTrainingGQL(t, includeCode = true) {
     str('title', t?.title),
     str('description', t?.description),
     str('categoryId', decId(t?.categoryId ?? t?.category?.id)),
+    str('levelId', decId(t?.levelId ?? t?.level?.id)),
     str('startDatetime', toISO(t?.startDatetime)),
     str('endDatetime', toISO(t?.endDatetime, true)),
     str('venue', t?.venue),

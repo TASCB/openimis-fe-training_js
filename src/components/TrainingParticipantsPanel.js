@@ -29,7 +29,7 @@ const EMPTY = {
 };
 
 function TrainingParticipantsPanel({
-  trainingId, participantReadOnly: readOnly, trainingParticipants, trainingSessions,
+  trainingId, participantReadOnly: readOnly, levelCode, trainingParticipants, trainingSessions,
   submittingMutation, mutation, fetchTrainingParticipants, fetchTrainingSessions,
   saveTrainingParticipant, deleteTrainingParticipant, journalize,
 }) {
@@ -121,6 +121,7 @@ function TrainingParticipantsPanel({
               <TableCell>
                 <ParticipantCategoryPicker
                   readOnly={readOnly}
+                  levelCode={levelCode}
                   value={p.category}
                   onChange={(v) => updateField(p, { categoryId: decId(v?.id) })}
                 />
@@ -165,7 +166,11 @@ function TrainingParticipantsPanel({
                 <GenderPicker withNull value={row.gender} onChange={(v) => setRow({ ...row, gender: v })} />
               </TableCell>
               <TableCell>
-                <ParticipantCategoryPicker value={row.category} onChange={(v) => setRow({ ...row, category: v })} />
+                <ParticipantCategoryPicker
+                  levelCode={levelCode}
+                  value={row.category}
+                  onChange={(v) => setRow({ ...row, category: v })}
+                />
               </TableCell>
               <TableCell>
                 <TextInput module="training" value={row.organization} onChange={(v) => setRow({ ...row, organization: v })} />

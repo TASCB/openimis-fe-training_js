@@ -8,21 +8,29 @@ import { PICKER_LIMIT } from '../constants';
 // Configurable reference data, ordered down the governance ladder by `sequence`.
 function ParticipantCategoryPicker({
   multiple, required, readOnly, value, onChange, label, withLabel = false, filterSelectedOptions,
+  levelCode,
 }) {
   const modulesManager = useModulesManager();
   const { formatMessage } = useTranslations('training', modulesManager);
-  const [filters, setFilters] = useState({ first: PICKER_LIMIT, isActive: true });
+  const [search, setSearch] = useState(undefined);
+  const filters = { first: PICKER_LIMIT, isActive: true, search, levelCode };
 
   const { isLoading, data, error } = useGraphqlQuery(
-    `query ParticipantCategoryPicker($search: String, $first: Int, $isActive: Boolean) {
-      participantCategory(name_Icontains: $search, first: $first, isActive: $isActive, orderBy: "sequence") {
-        edges { node { id code name } }
-      }
+    `query ParticipantCategoryPicker($search: String, $first: Int, $isActive: Boolean, $levelCode: String) {
+      permitted: participantCategory(
+        name_Icontains: $search, first: $first, isActive: $isActive,
+        primaryForLevels_Code: $levelCode, orderBy: "sequence"
+      ) { edges { node { id code name } } }
+      all: participantCategory(
+        name_Icontains: $search, first: $first, isActive: $isActive, orderBy: "sequence"
+      ) { edges { node { id code name } } }
     }`,
     filters,
   );
 
-  const categories = data?.participantCategory?.edges?.map((e) => e.node) ?? [];
+  const permitted = data?.permitted?.edges?.map((e) => e.node) ?? [];
+  const all = data?.all?.edges?.map((e) => e.node) ?? [];
+  const categories = levelCode && permitted.length ? permitted : all;
   const pickerLabel = label || formatMessage('training.participantCategoryPicker');
 
   return (
@@ -39,7 +47,7 @@ function ParticipantCategoryPicker({
       getOptionLabel={(o) => o.name}
       onChange={(v) => onChange(v, v ? v.name : null)}
       filterSelectedOptions={filterSelectedOptions}
-      onInputChange={(search) => setFilters({ first: PICKER_LIMIT, isActive: true, search })}
+      onInputChange={setSearch}
       renderInput={(inputProps) => (
         // eslint-disable-next-line react/jsx-props-no-spreading
         <TextField {...inputProps} required={required} label={pickerLabel} />

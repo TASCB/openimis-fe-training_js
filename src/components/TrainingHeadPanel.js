@@ -8,6 +8,7 @@ import {
 } from '@openimis/fe-core';
 import { TrainingStatusPicker } from '../pickers/ConstantPickers';
 import TrainingCategoryPicker from '../pickers/TrainingCategoryPicker';
+import TrainingLevelPicker from '../pickers/TrainingLevelPicker';
 import TrainingProfileCard from './TrainingProfileCard';
 import StringListInput from './StringListInput';
 import PaaLocationInput from './PaaLocationInput';
@@ -66,6 +67,24 @@ class TrainingHeadPanel extends FormPanel {
               onChange={(v) => this.updateAttributes({ category: v, categoryId: v?.id ?? null })}
             />
           </Grid>
+          <Grid item xs={4} className={classes.item}>
+            <TrainingLevelPicker
+              withLabel
+              readOnly={readOnly}
+              value={t?.level}
+              onChange={(v) => this.updateAttributes({ level: v, levelId: v?.id ?? null })}
+            />
+          </Grid>
+          {t?.level?.implementationLocation && (
+            <Grid item xs={4} className={classes.item}>
+              <TextInput
+                module="training"
+                label="training.level.implementationLocation"
+                readOnly
+                value={t.level.implementationLocation}
+              />
+            </Grid>
+          )}
           <Grid item xs={12} className={classes.item}>
             <TextInput
               module="training"
