@@ -49,7 +49,6 @@ function AttendanceFilter({ classes, filters, onChangeFilters }) {
         />
       </Grid>
       <Grid item xs={3} className={classes.item}>
-        {/* No label override: ConstantBasedPicker builds option keys from `label`. */}
         <AttendanceStatusPicker
           withNull
           value={filterValue('attendanceStatus')}
@@ -61,10 +60,9 @@ function AttendanceFilter({ classes, filters, onChangeFilters }) {
       <Grid item xs={3} className={classes.item}>
         <ParticipantCategoryPicker
           withLabel
-          label="training.participant.category"
+          label={formatMessage('training.participant.category')}
           value={filterValue('categoryObj')}
           onChange={(v) => onChangeFilters([{
-            // decId: relay global id -> UUID arg.
             id: 'categoryObj', value: v, filter: v ? `categoryId: "${decId(v.id)}"` : '',
           }])}
         />

@@ -17,8 +17,6 @@ const styles = (theme) => ({
 });
 
 class TrainerHeadPanel extends FormPanel {
-  // Clears the fields belonging to the mode being left, so a profile cannot keep a
-  // stale system account or organization.
   onTypeChange = (trainerType) => {
     if (trainerType === TRAINER_TYPE_INTERNAL) {
       this.updateAttributes({ trainerType, organization: INTERNAL_ORGANIZATION });
@@ -27,7 +25,6 @@ class TrainerHeadPanel extends FormPanel {
     }
   };
 
-  // The picker is the name field for internal trainers; full_name stays the stored name.
   onStaffUserChange = (staffUser) => this.updateAttributes({
     staffUser: staffUser ?? null,
     fullName: userDisplayName(staffUser),
@@ -61,7 +58,6 @@ class TrainerHeadPanel extends FormPanel {
               />
             </Grid>
           )}
-          {/* Type decides how name and organization are captured. */}
           <Grid item xs={4} className={classes.item}>
             <TrainerTypePicker
               readOnly={readOnly} value={t?.trainerType ?? TRAINER_TYPE_INTERNAL}
@@ -87,14 +83,12 @@ class TrainerHeadPanel extends FormPanel {
             )}
           </Grid>
           <Grid item xs={3} className={classes.item}>
-            {/* No label override: ConstantBasedPicker builds option keys from `label`. */}
             <GenderPicker
               withNull readOnly={readOnly}
               value={t?.gender} onChange={(v) => this.updateAttribute('gender', v)}
             />
           </Grid>
           <Grid item xs={4} className={classes.item}>
-            {/* From the RBAC catalogue, not typed, so titles stay comparable. */}
             <JobTitlePicker
               withLabel readOnly={readOnly}
               label={formatMessage(intl, 'training', 'training.trainer.position')}
@@ -114,7 +108,6 @@ class TrainerHeadPanel extends FormPanel {
             />
           </Grid>
           <Grid item xs={4} className={classes.item}>
-            {/* Internal trainers share one organization, so it is filled and locked. */}
             <TextInput
               module="training" label="training.trainer.organization"
               readOnly={readOnly || isInternal}

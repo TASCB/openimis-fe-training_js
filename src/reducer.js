@@ -322,8 +322,6 @@ function reducer(state = STORE_STATE, action) {
     case REQUEST(ACTION_TYPE.GET_UNIFIED_CALENDAR):
       return { ...state, fetchingCalendar: true, errorCalendar: null };
     case SUCCESS(ACTION_TYPE.GET_UNIFIED_CALENDAR):
-      // Ids arrive raw (UnifiedCalendarEventGQLType.id is a plain String, not a relay node),
-      // so they must not be decoded.
       return {
         ...state,
         fetchingCalendar: false,

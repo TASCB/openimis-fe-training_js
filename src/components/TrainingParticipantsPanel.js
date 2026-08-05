@@ -119,7 +119,6 @@ function TrainingParticipantsPanel({
                 />
               </TableCell>
               <TableCell>
-                {/* Inline: rows migrated off the old enum have no category. */}
                 <ParticipantCategoryPicker
                   readOnly={readOnly}
                   value={p.category}

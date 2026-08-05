@@ -33,8 +33,6 @@ export const ROWS_PER_PAGE_OPTIONS = [10, 20, 50, 100];
 export const CONTAINS_LOOKUP = 'Icontains';
 export const EMPTY_STRING = '';
 export const PICKER_LIMIT = 50;
-// The catalogue is a fixed 63; fetch them all so the tail stays reachable without
-// the user having to type a matching search.
 export const JOB_TITLE_PICKER_LIMIT = 100;
 
 export const TRAINING_STATUS = {
@@ -65,7 +63,6 @@ export const STATUS_COLORS = {
 export const TRAINER_TYPE_INTERNAL = 'INTERNAL';
 export const TRAINER_TYPE_LIST = [TRAINER_TYPE_INTERNAL, 'EXTERNAL'];
 
-// Internal trainers are TASAF staff, so their employer is not a per-profile question.
 export const INTERNAL_ORGANIZATION = 'TASAF';
 
 export const ASSIGNMENT_ROLE_LIST = [
@@ -73,7 +70,6 @@ export const ASSIGNMENT_ROLE_LIST = [
 ];
 export const ASSIGNMENT_STATUS_LIST = ['ASSIGNED', 'CONFIRMED', 'DECLINED', 'REPLACED', 'CANCELLED'];
 
-// Participant category is query-backed reference data, not a constant list.
 export const ATTENDANCE_STATUS_LIST = ['INVITED', 'CONFIRMED', 'ATTENDED', 'ABSENT', 'REPLACED'];
 
 // Mirrors training.models.Gender.
