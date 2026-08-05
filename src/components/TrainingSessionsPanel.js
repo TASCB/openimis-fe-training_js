@@ -24,6 +24,8 @@ import { qrStateKey } from '../utils/checkin';
 
 const EMPTY = { title: '', sessionDate: '', startTime: '', endTime: '' };
 
+const hhmm = (t) => (t ? String(t).slice(0, 5) : '');
+
 function TrainingSessionsPanel({
   trainingId, sessionsReadOnly: readOnly, trainingSessions, rights,
   submittingMutation, mutation,
@@ -92,7 +94,7 @@ function TrainingSessionsPanel({
               <TableCell>
                 {s.sessionDate ? formatDateFromISO(modulesManager, intl, s.sessionDate) : '—'}
               </TableCell>
-              <TableCell>{s.startTime ? `${s.startTime}${s.endTime ? ` – ${s.endTime}` : ''}` : '—'}</TableCell>
+              <TableCell>{s.startTime ? `${hhmm(s.startTime)}${s.endTime ? ` – ${hhmm(s.endTime)}` : ''}` : '—'}</TableCell>
               <TableCell>
                 <Chip
                   size="small"

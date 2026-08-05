@@ -8,11 +8,9 @@ import {
 import { ACTION_TYPE } from './reducer';
 import { toISO } from './utils/dates';
 
-// Mirrors admin.UserPicker's own projection, so a stored link renders in the picker
-// instead of coming back blank.
+
 const USER_PROJECTION = 'id username iUser { id otherNames lastName }';
 
-// FlatProjection: the PAA cascade needs the location's ancestors, not just `{ id code name }`.
 const TRAINING_LIST_PROJECTION = (mm) => [
   'id', 'code', 'title', 'status', 'startDatetime', 'endDatetime', 'venue',
   'expectedParticipants', 'paaReference', 'description',
@@ -55,16 +53,13 @@ const FILE_PROJECTION = () => [
   'id', 'fileName', 'fileType', 'description', 'fileUrl', 'dateCreated', 'userCreated { username }',
 ];
 
-// JSON.stringify (not fe-core formatGQLString, which double-escapes `"` and
-// truncates the query) — see docs/error-fixes and the FE↔BE boundary notes.
+
 const str = (k, v) => (v !== undefined && v !== null && v !== '' ? `${k}: ${JSON.stringify(String(v))}` : '');
 const raw = (k, v) => (v !== undefined && v !== null && v !== '' ? `${k}: ${v}` : '');
 const list = (k, v) => (Array.isArray(v) && v.length ? `${k}: [${v.map((x) => `"${x}"`).join(',')}]` : '');
 // like list() but emits `[]` for empty arrays so the field can be cleared on update
 const strList = (k, v) => (Array.isArray(v) ? `${k}: [${v.map((x) => JSON.stringify(String(x))).join(',')}]` : '');
 
-// Pickers/nested objects expose ids as relay global ids (base64 "Type:pk").
-// MUTATION inputs (graphene UUID/Int) need the raw pk → decode.
 export const decId = (v) => {
   if (v === undefined || v === null || v === '') return null;
   const s = String(v);
@@ -73,13 +68,11 @@ export const decId = (v) => {
   try { return decodeId(s); } catch (e) { return s; }
 };
 
-// Connection-field FK FILTERS are graphene-django GlobalIDFilters → they need the
-// encoded relay global id. Encode a raw uuid; pass through if already encoded.
 export const encId = (typeName, v) => {
   if (v === undefined || v === null || v === '') return null;
   const s = String(v);
   if (/^[0-9a-f-]{36}$/i.test(s)) return btoa(`${typeName}:${s}`);
-  return s; // already a relay global id
+  return s;
 };
 
 export function fetchTrainings(modulesManager, params) {
@@ -193,7 +186,7 @@ function formatTrainerGQL(t) {
     str('id', t?.id),
     str('code', t?.code),
     str('fullName', t?.fullName),
-    raw('gender', t?.gender), // GenderInput enum — must go unquoted
+    raw('gender', t?.gender), 
     str('positionId', decId(t?.positionId ?? t?.position?.id)),
     str('email', t?.email),
     str('phone', t?.phone),

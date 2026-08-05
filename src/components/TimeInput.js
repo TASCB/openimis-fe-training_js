@@ -1,11 +1,12 @@
 import React from 'react';
-import { TextField } from '@material-ui/core';
+import { KeyboardTimePicker } from '@material-ui/pickers';
+import moment from 'moment';
 import { makeStyles, alpha } from '@material-ui/core/styles';
 import { useModulesManager, useTranslations } from '@openimis/fe-core';
 import { MODULE_NAME } from '../constants';
 
-// fe-core publishes no time picker (only core.DatePicker/Month/Year), so this
-// mirrors that picker's brand styling to keep session rows visually consistent.
+const TIME_FORMATS = ['HH:mm:ss', 'HH:mm'];
+
 const useStyles = makeStyles((theme) => ({
   label: {
     color: theme.palette.primary.main,
@@ -38,16 +39,20 @@ function TimeInput({
   const inputId = id || `time-${label || 'input'}`;
 
   const field = (
-    <TextField
+    <KeyboardTimePicker
       id={inputId}
-      type="time"
+      ampm={false}
+      format="HH:mm"
+      placeholder="HH:mm"
+      mask="__:__"
       className={classes.field}
-      value={value || ''}
+      value={value ? moment(value, TIME_FORMATS) : null}
       disabled={readOnly}
       required={required}
-      onChange={(e) => onChange(e.target.value)}
+      onChange={(d) => onChange(d && d.isValid() ? d.format('HH:mm') : '')}
       InputLabelProps={{ shrink: true }}
       style={{ width }}
+      KeyboardButtonProps={{ size: 'small' }}
     />
   );
 
