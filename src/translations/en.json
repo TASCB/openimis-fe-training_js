@@ -1,6 +1,6 @@
 {
   "training.menu.trainings": "Trainings",
-  "training.menu.calendar": "Training Calendar",
+  "training.menu.calendar": "Calendar",
   "training.menu.trainers": "Trainer Profiles",
   "training.menu.dashboard": "Training Dashboard",
   "training.menu.attendance": "Attendance",
@@ -27,7 +27,6 @@
   "training.edit": "Edit",
   "training.open": "Open",
   "training.participant.location": "Location",
-
   "training.save": "Save",
   "training.back": "Back",
   "training.yes": "Yes",
@@ -39,7 +38,6 @@
   "training.editButton.tooltip": "Edit",
   "training.viewDetailsButton.tooltip": "View details",
   "training.emptyLabel": " ",
-
   "training.trainings.page.title": "Trainings",
   "training.trainers.page.title": "Trainer Profiles",
   "training.trainer.page.title": "Trainer Profile",
@@ -55,7 +53,6 @@
   "training.headPanel.title": "Training Details",
   "training.searcherResultsTitle": "{trainingsTotalCount} Trainings",
   "training.trainer.searcherResultsTitle": "{trainerProfilesTotalCount} Trainers",
-
   "training.code": "Code",
   "training.title": "Title",
   "training.category": "Training Area",
@@ -72,7 +69,6 @@
   "training.paa.placeholder": "Select a district to determine the PAA",
   "training.startFrom": "Start From",
   "training.startTo": "Start To",
-
   "training.status": "Status",
   "training.status.null": "Any",
   "training.status.DRAFT": "Draft",
@@ -84,16 +80,13 @@
   "training.status.COMPLETED": "Completed",
   "training.status.CANCELLED": "Cancelled",
   "training.status.CLOSED": "Closed",
-
   "training.deleteDialog.title": "Delete training",
   "training.deleteDialog.message": "Delete training {code}? It will be soft-deleted.",
   "training.delete.mutationLabel": "Delete training {code}",
   "training.create.mutationLabel": "Create training {code}",
   "training.update.mutationLabel": "Update training {code}",
-
   "training.conflict.hardTitle": "Conflicts that block saving:",
   "training.conflict.softTitle": "Warnings (saving allowed):",
-
   "training.action.submit": "Submit",
   "training.action.approve": "Approve",
   "training.action.reject": "Reject",
@@ -122,7 +115,6 @@
   "training.reschedule.dismiss": "Cancel",
   "training.reschedule.history": "Reschedule history",
   "training.reschedule.historyEntry": "{from} → {to} · {by} · {at}",
-
   "training.assignments.title": "Trainers",
   "training.assignment.trainer": "Trainer",
   "training.assignment.staffUser": "System User",
@@ -131,7 +123,6 @@
   "training.assignment.notes": "Notes",
   "training.assignment.add.mutationLabel": "Add training assignment",
   "training.assignment.delete.mutationLabel": "Remove training assignment",
-
   "training.role": "Role",
   "training.role.null": "Any",
   "training.role.LEAD_TRAINER": "Lead Trainer",
@@ -140,7 +131,6 @@
   "training.role.COORDINATOR": "Coordinator",
   "training.role.OBSERVER": "Observer",
   "training.role.SUPPORT_STAFF": "Support Staff",
-
   "training.assignmentStatus": "Status",
   "training.assignmentStatus.null": "Any",
   "training.assignmentStatus.ASSIGNED": "Assigned",
@@ -148,7 +138,6 @@
   "training.assignmentStatus.DECLINED": "Declined",
   "training.assignmentStatus.REPLACED": "Replaced",
   "training.assignmentStatus.CANCELLED": "Cancelled",
-
   "training.participants.title": "Participants",
   "training.participant.fullName": "Full Name",
   "training.participant.category": "Category",
@@ -162,14 +151,11 @@
   "training.participant.add.mutationLabel": "Add participant",
   "training.participant.update.mutationLabel": "Update participant",
   "training.participant.delete.mutationLabel": "Remove participant",
-
   "training.participantCategoryPicker": "Category",
-
   "training.gender": "Gender",
   "training.gender.null": "Any",
   "training.gender.M": "Male",
   "training.gender.F": "Female",
-
   "training.attendanceStatus": "Attendance",
   "training.attendanceStatus.null": "Any",
   "training.attendanceStatus.INVITED": "Invited",
@@ -177,7 +163,6 @@
   "training.attendanceStatus.ATTENDED": "Attended",
   "training.attendanceStatus.ABSENT": "Absent",
   "training.attendanceStatus.REPLACED": "Replaced",
-
   "training.sessions.title": "Sessions",
   "training.session.title": "Session",
   "training.session.date": "Date",
@@ -196,7 +181,6 @@
   "training.session.qr.closedHint": "Open registration so attendees can check in.",
   "training.session.qr.openAutoHint": "Check-in opens by itself while the session is running. Use the switch to open it earlier or on another day.",
   "training.session.qr.count": "Checked in",
-
   "training.checkin.intro": "Enter your details to register your attendance.",
   "training.checkin.readMore": "Read more",
   "training.checkin.readLess": "Read less",
@@ -238,7 +222,6 @@
   "training.checkin.notFound": "This check-in link is not valid.",
   "training.checkin.requiredError": "Full name and phone are required.",
   "training.checkin.submitError": "Could not check you in. Please try again.",
-
   "training.materials.title": "Materials",
   "training.evidence.title": "Evidence",
   "training.file.name": "File",
@@ -249,7 +232,6 @@
   "training.file.upload": "Upload",
   "training.material.delete.mutationLabel": "Delete training material",
   "training.evidence.delete.mutationLabel": "Delete training evidence",
-
   "training.evidenceType": "Type",
   "training.evidenceType.null": "Any",
   "training.evidenceType.REPORT": "Training Report",
@@ -259,7 +241,6 @@
   "training.evidenceType.EVALUATION_SUMMARY": "Evaluation Summary",
   "training.evidenceType.TRAINER_REPORT": "Trainer Report",
   "training.evidenceType.OTHER": "Other",
-
   "training.trainer.code": "Code",
   "training.trainer.fullName": "Full Name",
   "training.trainer.type": "Type",
@@ -278,12 +259,10 @@
   "training.trainer.delete.mutationLabel": "Delete trainer {name}",
   "training.trainer.create.mutationLabel": "Create trainer {name}",
   "training.trainer.update.mutationLabel": "Update trainer {name}",
-
   "training.trainerType": "Type",
   "training.trainerType.null": "Any",
   "training.trainerType.INTERNAL": "Internal",
   "training.trainerType.EXTERNAL": "External",
-
   "training.calendar.today": "Today",
   "training.calendar.month": "Month",
   "training.calendar.week": "Week",
@@ -303,7 +282,6 @@
   "training.calendar.dow.fri": "Fri",
   "training.calendar.dow.sat": "Sat",
   "training.calendar.dow.sun": "Sun",
-
   "training.dashboard.total": "Total Trainings",
   "training.dashboard.thisWeek": "This Week",
   "training.dashboard.upcoming": "Upcoming",
@@ -313,5 +291,11 @@
   "training.dashboard.activeTrainers": "Active Trainers",
   "training.dashboard.byStatus": "Trainings by Status",
   "training.dashboard.byCategory": "Trainings by Programme Area",
-  "training.dashboard.noCategory": "Uncategorised"
+  "training.dashboard.noCategory": "Uncategorised",
+  "training.calendar.scope.module": "This module",
+  "training.calendar.scope.all": "All activities",
+  "training.calendar.sourceLegend": "Activity source",
+  "training.calendar.source.TRAINING": "Training",
+  "training.calendar.source.COORDINATION": "Coordination",
+  "training.calendar.source.COMMUNICATIONS": "Communications"
 }

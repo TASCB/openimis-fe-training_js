@@ -471,6 +471,18 @@ export function fetchTrainingSummary(variables = {}) {
   );
 }
 
+export function fetchUnifiedCalendar(variables) {
+  return graphqlWithVariables(
+    `query ($dateFrom: DateTime!, $dateTo: DateTime!, $status: String, $sources: [String]) {
+      coordinationUnifiedCalendar(dateFrom: $dateFrom, dateTo: $dateTo, status: $status, sources: $sources) {
+        id code title status startDatetime endDatetime source department
+      }
+    }`,
+    variables,
+    ACTION_TYPE.GET_UNIFIED_CALENDAR,
+  );
+}
+
 export function fetchTrainingCalendar(variables) {
   return graphqlWithVariables(
     `query ($dateFrom: DateTime!, $dateTo: DateTime!, $status: String, $categoryId: UUID,

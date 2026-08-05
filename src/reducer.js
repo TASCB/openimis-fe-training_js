@@ -29,6 +29,7 @@ export const ACTION_TYPE = {
   GET_SUMMARY: 'TRAINING_SUMMARY',
   GET_PAA: 'TRAINING_PAA_FOR_LOCATION',
   GET_CALENDAR: 'TRAINING_CALENDAR',
+  GET_UNIFIED_CALENDAR: 'TRAINING_UNIFIED_CALENDAR',
   CREATE_TRAINING: 'TRAINING_CREATE_TRAINING',
   UPDATE_TRAINING: 'TRAINING_UPDATE_TRAINING',
   DELETE_TRAINING: 'TRAINING_DELETE_TRAINING',
@@ -316,6 +317,20 @@ function reducer(state = STORE_STATE, action) {
         errorCalendar: formatGraphQLError(action.payload),
       };
     case ERROR(ACTION_TYPE.GET_CALENDAR):
+      return { ...state, fetchingCalendar: false, errorCalendar: formatServerError(action.payload) };
+
+    case REQUEST(ACTION_TYPE.GET_UNIFIED_CALENDAR):
+      return { ...state, fetchingCalendar: true, errorCalendar: null };
+    case SUCCESS(ACTION_TYPE.GET_UNIFIED_CALENDAR):
+      // Ids arrive raw (UnifiedCalendarEventGQLType.id is a plain String, not a relay node),
+      // so they must not be decoded.
+      return {
+        ...state,
+        fetchingCalendar: false,
+        trainingCalendar: action.payload.data.coordinationUnifiedCalendar ?? [],
+        errorCalendar: formatGraphQLError(action.payload),
+      };
+    case ERROR(ACTION_TYPE.GET_UNIFIED_CALENDAR):
       return { ...state, fetchingCalendar: false, errorCalendar: formatServerError(action.payload) };
 
     case REQUEST(ACTION_TYPE.MUTATION):
