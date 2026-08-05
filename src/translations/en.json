@@ -301,5 +301,9 @@
   "training.levelPicker": "Training level",
   "training.level": "Training level",
   "training.level.implementationLocation": "Implementation location",
-  "training.level.reportingApplication": "Reporting application"
+  "training.level.reportingApplication": "Reporting application",
+  "training.assignment.assignee": "Assignee",
+  "training.assignment.assigneeType": "Assign from",
+  "training.assignment.assigneeType.TRAINER": "Trainer profile",
+  "training.assignment.assigneeType.STAFF": "System user"
 }

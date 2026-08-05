@@ -7,7 +7,7 @@ import {
 } from '@material-ui/core';
 import DeleteIcon from '@material-ui/icons/Delete';
 import {
-  PublishedComponent, TextInput, useModulesManager, useTranslations, journalize,
+  PublishedComponent, SelectInput, TextInput, useModulesManager, useTranslations, journalize,
 } from '@openimis/fe-core';
 import { userDisplayName } from '../utils/users';
 import {
@@ -16,7 +16,12 @@ import {
 import TrainerPicker from '../pickers/TrainerPicker';
 import { AssignmentRolePicker, AssignmentStatusPicker } from '../pickers/ConstantPickers';
 
+const ASSIGNEE_TRAINER = 'TRAINER';
+const ASSIGNEE_STAFF = 'STAFF';
+const ASSIGNEE_TYPES = [ASSIGNEE_TRAINER, ASSIGNEE_STAFF];
+
 const EMPTY = {
+  assigneeType: ASSIGNEE_TRAINER,
   trainer: null,
   staffUser: null,
   role: 'LEAD_TRAINER',
@@ -49,10 +54,12 @@ function TrainingAssignmentsPanel({
     }
   }, [trainingAssignments]);
 
-  // An assignee is either a trainer profile or a system user — never both, so picking
-  // one clears the other.
-  const pickTrainer = (v) => setRow({ ...row, trainer: v ?? null, staffUser: null });
-  const pickStaffUser = (v) => setRow({ ...row, staffUser: v ?? null, trainer: null });
+  const setAssigneeType = (v) => setRow({
+    ...row, assigneeType: v || ASSIGNEE_TRAINER, trainer: null, staffUser: null,
+  });
+  const pickAssignee = (v) => (row.assigneeType === ASSIGNEE_STAFF
+    ? setRow({ ...row, staffUser: v ?? null, trainer: null })
+    : setRow({ ...row, trainer: v ?? null, staffUser: null }));
 
   const add = () => {
     if (!row.trainer && !row.staffUser) return;
@@ -76,8 +83,8 @@ function TrainingAssignmentsPanel({
     <Table size="small">
         <TableHead>
           <TableRow>
-            <TableCell>{formatMessage('training.assignment.trainer')}</TableCell>
-            <TableCell>{formatMessage('training.assignment.staffUser')}</TableCell>
+            <TableCell>{formatMessage('training.assignment.assigneeType')}</TableCell>
+            <TableCell>{formatMessage('training.assignment.assignee')}</TableCell>
             <TableCell>{formatMessage('training.assignment.role')}</TableCell>
             <TableCell>{formatMessage('training.assignment.status')}</TableCell>
             <TableCell>{formatMessage('training.assignment.notes')}</TableCell>
@@ -87,8 +94,12 @@ function TrainingAssignmentsPanel({
         <TableBody>
           {(trainingAssignments ?? []).map((a) => (
             <TableRow key={a.id}>
-              <TableCell>{a.trainer ? `${a.trainer.fullName} (${a.trainer.code})` : ''}</TableCell>
-              <TableCell>{userDisplayName(a.staffUser)}</TableCell>
+              <TableCell>
+                {formatMessage(`training.assignment.assigneeType.${a.trainer ? 'TRAINER' : 'STAFF'}`)}
+              </TableCell>
+              <TableCell>
+                {a.trainer ? `${a.trainer.fullName} (${a.trainer.code})` : userDisplayName(a.staffUser)}
+              </TableCell>
               <TableCell>{formatMessage(`training.role.${a.role}`)}</TableCell>
               <TableCell>{formatMessage(`training.assignmentStatus.${a.status}`)}</TableCell>
               <TableCell>{a.notes}</TableCell>
@@ -104,15 +115,26 @@ function TrainingAssignmentsPanel({
           {!readOnly && (
             <TableRow>
               <TableCell>
-                <TrainerPicker withLabel value={row.trainer} onChange={pickTrainer} />
+                <SelectInput
+                  module="training"
+                  options={ASSIGNEE_TYPES.map((t) => ({
+                    value: t, label: formatMessage(`training.assignment.assigneeType.${t}`),
+                  }))}
+                  value={row.assigneeType}
+                  onChange={setAssigneeType}
+                />
               </TableCell>
               <TableCell>
-                <PublishedComponent
-                  pubRef="admin.UserPicker"
-                  module="training"
-                  value={row.staffUser}
-                  onChange={pickStaffUser}
-                />
+                {row.assigneeType === ASSIGNEE_STAFF ? (
+                  <PublishedComponent
+                    pubRef="admin.UserPicker"
+                    module="training"
+                    value={row.staffUser}
+                    onChange={pickAssignee}
+                  />
+                ) : (
+                  <TrainerPicker withLabel value={row.trainer} onChange={pickAssignee} />
+                )}
               </TableCell>
               <TableCell>
                 <AssignmentRolePicker value={row.role} onChange={(v) => setRow({ ...row, role: v })} />
