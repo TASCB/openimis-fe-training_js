@@ -7,9 +7,27 @@ import {
 } from '@openimis/fe-core';
 import { MODULE_NAME } from '../constants';
 import { fetchTrainingSummary } from '../actions';
+import DonutLargeIcon from '@material-ui/icons/DonutLarge';
+import CategoryIcon from '@material-ui/icons/Category';
+import EditIcon from '@material-ui/icons/Edit';
+import SendIcon from '@material-ui/icons/Send';
+import CheckIcon from '@material-ui/icons/Check';
+import HighlightOffIcon from '@material-ui/icons/HighlightOff';
+import EventIcon from '@material-ui/icons/Event';
+import PlayCircleOutlineIcon from '@material-ui/icons/PlayCircleOutline';
+import DoneAllIcon from '@material-ui/icons/DoneAll';
+import BlockIcon from '@material-ui/icons/Block';
+import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import {
-  DashboardHeader, StatCard, SectionCard, Breakdown, RankedList,
+  DashboardHeader, StatCard, SectionCard, PipelineFlow, RankedList,
 } from '@openimis/fe-tasaf_common';
+
+const STATUS_FLOW = [
+  ['DRAFT', <EditIcon />], ['SUBMITTED', <SendIcon />], ['APPROVED', <CheckIcon />],
+  ['REJECTED', <HighlightOffIcon />], ['SCHEDULED', <EventIcon />],
+  ['ONGOING', <PlayCircleOutlineIcon />], ['COMPLETED', <DoneAllIcon />],
+  ['CANCELLED', <BlockIcon />], ['CLOSED', <LockOutlinedIcon />],
+];
 
 const useStyles = makeStyles((theme) => ({ page: theme.page }));
 
@@ -41,9 +59,12 @@ function TrainingDashboardPage() {
     ['training.dashboard.activeTrainers', summary?.activeTrainers],
   ];
 
-  const byStatus = (summary?.byStatus ?? []).map((r) => ({
-    key: r.status, label: t(`training.status.${r.status}`), value: r.count,
-  }));
+  const counts = Object.fromEntries((summary?.byStatus ?? []).map((r) => [r.status, r.count]));
+  const statusStages = STATUS_FLOW
+    .filter(([code]) => counts[code] !== undefined)
+    .map(([code, icon]) => ({
+      key: code, icon, label: t(`training.status.${code}`), value: counts[code] ?? 0,
+    }));
   const byCategory = (summary?.byCategory ?? []).map((r) => ({
     key: r.categoryId ?? 'none', label: r.categoryName ?? t('training.dashboard.noCategory'), value: r.count,
   }));
@@ -65,32 +86,22 @@ function TrainingDashboardPage() {
       {!error && (
         <>
           <Grid container spacing={3}>
-            {primary.map(([l, v]) => (
-              <Grid item xs={6} md={3} key={l}>
-                <StatCard primary label={t(l)} value={v} />
+            {[...primary, ...secondary].map(([l, v]) => (
+              <Grid item xs={12} sm={6} md={3} key={l}>
+                <StatCard label={t(l)} value={v} />
               </Grid>
             ))}
           </Grid>
 
-          <Box mt={2}>
-            <Grid container spacing={2}>
-              {secondary.map(([l, v]) => (
-                <Grid item xs={6} sm={4} key={l}>
-                  <StatCard label={t(l)} value={v} />
-                </Grid>
-              ))}
-            </Grid>
-          </Box>
-
           <Box mt={3}>
             <Grid container spacing={3}>
-              <Grid item xs={12} md={6}>
-                <SectionCard title={t('training.dashboard.byStatus')}>
-                  <Breakdown items={byStatus} emptyText={empty} />
+              <Grid item xs={12}>
+                <SectionCard title={t('training.dashboard.byStatus')} icon={<DonutLargeIcon />}>
+                  <PipelineFlow stages={statusStages} emptyText={empty} />
                 </SectionCard>
               </Grid>
               <Grid item xs={12} md={6}>
-                <SectionCard title={t('training.dashboard.byCategory')}>
+                <SectionCard title={t('training.dashboard.byCategory')} icon={<CategoryIcon />}>
                   <RankedList items={byCategory} emptyText={empty} />
                 </SectionCard>
               </Grid>
