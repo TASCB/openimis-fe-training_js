@@ -12,7 +12,6 @@ import CategoryIcon from '@material-ui/icons/Category';
 import EditIcon from '@material-ui/icons/Edit';
 import SendIcon from '@material-ui/icons/Send';
 import CheckIcon from '@material-ui/icons/Check';
-import HighlightOffIcon from '@material-ui/icons/HighlightOff';
 import EventIcon from '@material-ui/icons/Event';
 import PlayCircleOutlineIcon from '@material-ui/icons/PlayCircleOutline';
 import DoneAllIcon from '@material-ui/icons/DoneAll';
@@ -24,9 +23,9 @@ import {
 
 const STATUS_FLOW = [
   ['DRAFT', <EditIcon />], ['SUBMITTED', <SendIcon />], ['APPROVED', <CheckIcon />],
-  ['REJECTED', <HighlightOffIcon />], ['SCHEDULED', <EventIcon />],
-  ['ONGOING', <PlayCircleOutlineIcon />], ['COMPLETED', <DoneAllIcon />],
-  ['CANCELLED', <BlockIcon />], ['CLOSED', <LockOutlinedIcon />],
+  ['SCHEDULED', <EventIcon />], ['ONGOING', <PlayCircleOutlineIcon />],
+  ['COMPLETED', <DoneAllIcon />], ['CLOSED', <LockOutlinedIcon />],
+  ['CANCELLED', <BlockIcon />],
 ];
 
 const useStyles = makeStyles((theme) => ({ page: theme.page }));
@@ -56,8 +55,6 @@ function TrainingDashboardPage() {
     ['training.dashboard.thisWeek', summary?.trainingsThisWeek, goTrainings],
     ['training.dashboard.upcoming', summary?.upcomingTrainings, goTrainings],
     ['training.dashboard.ongoing', summary?.ongoingTrainings, goTrainings],
-    ['training.dashboard.completed', summary?.completedTrainings, goTrainings],
-    ['training.dashboard.cancelled', summary?.cancelledTrainings, goTrainings],
     ['training.dashboard.activeTrainers', summary?.activeTrainers, goTrainers],
   ];
 
