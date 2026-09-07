@@ -54,7 +54,6 @@ function TrainingDashboardPage() {
     ['training.dashboard.total', summary?.totalTrainings, goTrainings],
     ['training.dashboard.thisWeek', summary?.trainingsThisWeek, goTrainings],
     ['training.dashboard.upcoming', summary?.upcomingTrainings, goTrainings],
-    ['training.dashboard.ongoing', summary?.ongoingTrainings, goTrainings],
     ['training.dashboard.activeTrainers', summary?.activeTrainers, goTrainers],
   ];
 
@@ -94,7 +93,7 @@ function TrainingDashboardPage() {
             <Grid container spacing={3}>
               <Grid item xs={12}>
                 <SectionCard title={t('training.dashboard.byStatus')} icon={<DonutLargeIcon />}>
-                  <PipelineFlow stages={statusStages} emptyText={empty} />
+                  <PipelineFlow stages={statusStages} emptyText={empty} maxPerRow={4} />
                 </SectionCard>
               </Grid>
               <Grid item xs={12} md={6}>

@@ -309,6 +309,5 @@
   "training.dashboard.total.caption": "All trainings on record",
   "training.dashboard.thisWeek.caption": "Starting within this week",
   "training.dashboard.upcoming.caption": "Approved or scheduled ahead",
-  "training.dashboard.ongoing.caption": "Running right now",
   "training.dashboard.activeTrainers.caption": "Trainers with an active profile"
 }
