@@ -4,6 +4,7 @@ import { bindActionCreators } from 'redux';
 import {
   IconButton, Tooltip, Dialog, DialogContent, DialogActions, Button,
 } from '@material-ui/core';
+import { makeStyles } from '@material-ui/core/styles';
 import VisibilityIcon from '@material-ui/icons/Visibility';
 import {
   Searcher, useHistory, useModulesManager, useTranslations,
@@ -14,6 +15,17 @@ import {
 } from '../constants';
 import AttendanceFilter from './AttendanceFilter';
 import AttendanceProfileCard from './AttendanceProfileCard';
+
+// Equal-width searcher columns;
+const useSearcherTable = makeStyles(() => ({
+  root: {
+    '& table': { tableLayout: 'fixed' },
+    '& table th': { whiteSpace: 'nowrap' },
+    '& table th:last-child, & table td:last-child': {
+      width: 56, paddingLeft: 0, paddingRight: 0, textAlign: 'center',
+    },
+  },
+}));
 
 function AttendanceSearcher({
   fetchAttendances,
@@ -64,8 +76,9 @@ function AttendanceSearcher({
     <AttendanceFilter filters={filters} onChangeFilters={onChangeFilters} />
   );
 
+  const tableClasses = useSearcherTable();
   return (
-    <>
+    <div className={tableClasses.root}>
       <Dialog open={!!viewed} onClose={() => setViewed(null)} maxWidth="sm" fullWidth PaperProps={{ style: { borderRadius: 0 } }}>
         <DialogContent style={{ padding: 0 }}>
           {viewed && <AttendanceProfileCard attendance={viewed} />}
@@ -97,7 +110,7 @@ function AttendanceSearcher({
       rowIdentifier={(p) => p.id}
       onDoubleClick={(p) => setViewed(p)}
     />
-    </>
+    </div>
   );
 }
 

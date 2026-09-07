@@ -5,7 +5,7 @@ import { fetchPaaForLocation, clearPaaForLocation, decId } from '../actions';
 import { locationLevels } from '../utils/paa';
 
 // Which PAA the chosen location belongs to, resolved live by the backend. Read-only by design —
-// the PAA is derived from the location, never typed. See docs/PAA_LOCATION.md.
+// the PAA is derived from the location, never typed.
 function PaaReadout({ location }) {
   const dispatch = useDispatch();
   const modulesManager = useModulesManager();

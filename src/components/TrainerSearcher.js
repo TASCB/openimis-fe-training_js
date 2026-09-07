@@ -57,15 +57,8 @@ const Filter = injectIntl(withTheme(withStyles(defaultFilterStyles)(({ classes, 
 //Fixed layout ( code, Full name,Type ,Organization,Email,Active,View,Edit,delete,trailong spacer)
 const useStyles = makeStyles(() => ({
   searcher: {
-    '& table': { tableLayout: 'fixed', minWidth: '100%' },
-    '& table th, & table td': { whiteSpace: 'nowrap' },
-    '& table th:nth-child(-n+6), & table td:nth-child(-n+6)': { overflow: 'hidden', textOverflow: 'ellipsis' },
-    '& table th:nth-child(1), & table td:nth-child(1)': { width: 110 },
-    '& table th:nth-child(2), & table td:nth-child(2)': { width: 200 },
-    '& table th:nth-child(3), & table td:nth-child(3)': { width: 110 },
-    '& table th:nth-child(4), & table td:nth-child(4)': { width: 200 },
-    '& table th:nth-child(5), & table td:nth-child(5)': { width: 250 },
-    '& table th:nth-child(6), & table td:nth-child(6)': { width: 90 },
+    '& table': { tableLayout: 'fixed' },
+    '& table th': { whiteSpace: 'nowrap' },
     '& table th:nth-child(7), & table td:nth-child(7)': { width: 56 },
     '& table th:nth-child(8), & table td:nth-child(8)': { width: 56 },
     '& table th:nth-child(9), & table td:nth-child(9)': { width: 56 },
