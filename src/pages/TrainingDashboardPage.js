@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { makeStyles } from '@material-ui/styles';
 import { Grid, Box } from '@material-ui/core';
 import {
-  Helmet, useTranslations, useModulesManager, ProgressOrError,
+  Helmet, useTranslations, useModulesManager, ProgressOrError, useHistory,
 } from '@openimis/fe-core';
 import { MODULE_NAME } from '../constants';
 import { fetchTrainingSummary } from '../actions';
@@ -47,24 +47,24 @@ function TrainingDashboardPage() {
   const t = (k) => formatMessage(k);
   const empty = t('training.dashboard.empty');
 
-  const primary = [
-    ['training.dashboard.total', summary?.totalTrainings],
-    ['training.dashboard.thisWeek', summary?.trainingsThisWeek],
-    ['training.dashboard.upcoming', summary?.upcomingTrainings],
-    ['training.dashboard.ongoing', summary?.ongoingTrainings],
-  ];
-  const secondary = [
-    ['training.dashboard.completed', summary?.completedTrainings],
-    ['training.dashboard.cancelled', summary?.cancelledTrainings],
-    ['training.dashboard.activeTrainers', summary?.activeTrainers],
+  const history = useHistory();
+  const goTrainings = () => history.push('/trainings');
+  const goTrainers = () => history.push('/trainings/trainers');
+
+  const cards = [
+    ['training.dashboard.total', summary?.totalTrainings, goTrainings],
+    ['training.dashboard.thisWeek', summary?.trainingsThisWeek, goTrainings],
+    ['training.dashboard.upcoming', summary?.upcomingTrainings, goTrainings],
+    ['training.dashboard.ongoing', summary?.ongoingTrainings, goTrainings],
+    ['training.dashboard.completed', summary?.completedTrainings, goTrainings],
+    ['training.dashboard.cancelled', summary?.cancelledTrainings, goTrainings],
+    ['training.dashboard.activeTrainers', summary?.activeTrainers, goTrainers],
   ];
 
   const counts = Object.fromEntries((summary?.byStatus ?? []).map((r) => [r.status, r.count]));
-  const statusStages = STATUS_FLOW
-    .filter(([code]) => counts[code] !== undefined)
-    .map(([code, icon]) => ({
-      key: code, icon, label: t(`training.status.${code}`), value: counts[code] ?? 0,
-    }));
+  const statusStages = STATUS_FLOW.map(([code, icon]) => ({
+    key: code, icon, label: t(`training.status.${code}`), value: counts[code] ?? 0,
+  }));
   const byCategory = (summary?.byCategory ?? []).map((r) => ({
     key: r.categoryId ?? 'none', label: r.categoryName ?? t('training.dashboard.noCategory'), value: r.count,
   }));
@@ -86,9 +86,9 @@ function TrainingDashboardPage() {
       {!error && (
         <>
           <Grid container spacing={3}>
-            {[...primary, ...secondary].map(([l, v]) => (
+            {cards.map(([l, v, onClick]) => (
               <Grid item xs={12} sm={6} md={3} key={l}>
-                <StatCard label={t(l)} value={v} />
+                <StatCard label={t(l)} value={v} caption={t(`${l}.caption`)} onClick={onClick} />
               </Grid>
             ))}
           </Grid>

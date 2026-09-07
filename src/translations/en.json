@@ -305,5 +305,12 @@
   "training.assignment.assignee": "Assignee",
   "training.assignment.assigneeType": "Assign from",
   "training.assignment.assigneeType.TRAINER": "Trainer profile",
-  "training.assignment.assigneeType.STAFF": "System user"
+  "training.assignment.assigneeType.STAFF": "System user",
+  "training.dashboard.total.caption": "All trainings on record",
+  "training.dashboard.thisWeek.caption": "Starting within this week",
+  "training.dashboard.upcoming.caption": "Approved or scheduled ahead",
+  "training.dashboard.ongoing.caption": "Running right now",
+  "training.dashboard.completed.caption": "Finished and reported",
+  "training.dashboard.cancelled.caption": "Called off",
+  "training.dashboard.activeTrainers.caption": "Trainers with an active profile"
 }
