@@ -135,7 +135,7 @@ function TrainingPage({ trainingUuid }) {
         save={save}
         canSave={canSave}
         saveTooltip={formatMessage('saveButton.tooltip')}
-        HeadPanel={TrainingHeadPanel}
+        Panels={[TrainingHeadPanel]}
         Panels={getPanels()}
         actions={actions}
         readOnly={!canEditDetails}

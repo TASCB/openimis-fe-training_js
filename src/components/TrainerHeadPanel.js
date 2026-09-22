@@ -1,6 +1,8 @@
 import React from 'react';
 import { injectIntl } from 'react-intl';
-import { Divider, Grid, Typography } from '@material-ui/core';
+import {
+  Divider, Grid, Paper, Typography,
+} from '@material-ui/core';
 import { withStyles, withTheme } from '@material-ui/core/styles';
 import {
   FormattedMessage, FormPanel, PublishedComponent, TextInput, withModulesManager, formatMessage,
@@ -12,6 +14,7 @@ import { userDisplayName } from '../utils/users';
 import TrainerProfileCard from './TrainerProfileCard';
 
 const styles = (theme) => ({
+  paper: theme.paper.paper,
   tableTitle: theme.table.title,
   item: theme.paper.item,
 });
@@ -40,7 +43,7 @@ class TrainerHeadPanel extends FormPanel {
     const isInternal = (t?.trainerType ?? TRAINER_TYPE_INTERNAL) === TRAINER_TYPE_INTERNAL;
     if (readOnly) return <TrainerProfileCard trainer={edited} />;
     return (
-      <>
+      <Paper className={classes.paper}>
         <Grid container className={classes.tableTitle}>
           <Grid item>
             <Typography>
@@ -128,7 +131,7 @@ class TrainerHeadPanel extends FormPanel {
             />
           </Grid>
         </Grid>
-      </>
+      </Paper>
     );
   }
 }

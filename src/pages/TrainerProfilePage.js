@@ -87,7 +87,7 @@ function TrainerProfilePage({ trainerUuid }) {
         save={save}
         canSave={canSave}
         saveTooltip={formatMessage('saveButton.tooltip')}
-        HeadPanel={TrainerHeadPanel}
+        Panels={[TrainerHeadPanel]}
         readOnly={!canManage}
         rights={rights}
       />

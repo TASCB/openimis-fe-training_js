@@ -1,6 +1,8 @@
 import React from 'react';
 import { injectIntl } from 'react-intl';
-import { Divider, Grid, Typography } from '@material-ui/core';
+import {
+  Divider, Grid, Paper, Typography,
+} from '@material-ui/core';
 import { withStyles, withTheme } from '@material-ui/core/styles';
 import {
   FormattedMessage, FormPanel, PublishedComponent, TextInput, NumberInput, withModulesManager,
@@ -15,6 +17,7 @@ import PaaLocationInput from './PaaLocationInput';
 import PaaReadout from './PaaReadout';
 
 const styles = (theme) => ({
+  paper: theme.paper.paper,
   tableTitle: theme.table.title,
   item: theme.paper.item,
   fullHeight: { height: '100%' },
@@ -28,7 +31,7 @@ class TrainingHeadPanel extends FormPanel {
     const t = { ...edited };
     if (readOnly) return <TrainingProfileCard training={edited} />;
     return (
-      <>
+      <Paper className={classes.paper}>
         <Grid container className={classes.tableTitle}>
           <Grid item>
             <Typography>
@@ -178,7 +181,7 @@ class TrainingHeadPanel extends FormPanel {
             />
           </Grid>
         </Grid>
-      </>
+      </Paper>
     );
   }
 }
