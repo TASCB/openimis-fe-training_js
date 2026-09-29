@@ -3,7 +3,7 @@ import { bindActionCreators } from 'redux';
 import { connect, useSelector } from 'react-redux';
 
 import {
-  IconButton, Tooltip, Dialog, DialogContent, DialogActions, Button,
+  IconButton, Tooltip,
 } from '@material-ui/core';
 import { makeStyles } from '@material-ui/core/styles';
 import VisibilityIcon from '@material-ui/icons/Visibility';
@@ -21,7 +21,7 @@ import {
 } from '../constants';
 import TrainingFilter from './TrainingFilter';
 import StatusChip from './StatusChip';
-import TrainingProfileCard from './TrainingProfileCard';
+import TrainingPreviewDialog from './TrainingPreviewDialog';
 
 // Columns: code(1) title status start end venue participants(8) view(9) delete(10) spacer(last).
 const useStyles = makeStyles(() => ({
@@ -136,17 +136,11 @@ function TrainingSearcher({
 
   return (
     <>
-      <Dialog open={!!viewed} onClose={() => setViewed(null)} maxWidth="md" fullWidth PaperProps={{ style: { borderRadius: 0 } }}>
-        <DialogContent style={{ padding: 0 }}>
-          {viewed && <TrainingProfileCard training={viewed} />}
-        </DialogContent>
-        <DialogActions>
-          {viewed && rights.includes(RIGHT_TRAINING_SEARCH) && (
-            <Button color="primary" onClick={() => openTraining(viewed)}>{formatMessage('training.open')}</Button>
-          )}
-          <Button onClick={() => setViewed(null)}>{formatMessage('training.close')}</Button>
-        </DialogActions>
-      </Dialog>
+      <TrainingPreviewDialog
+        training={viewed}
+        onClose={() => setViewed(null)}
+        onOpen={rights.includes(RIGHT_TRAINING_SEARCH) ? openTraining : null}
+      />
       <div className={classes.searcher}>
         <Searcher
           module="training"

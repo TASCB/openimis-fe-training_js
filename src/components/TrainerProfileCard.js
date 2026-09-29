@@ -33,7 +33,7 @@ function TrainerProfileCard({ trainer }) {
           {typeLabel && <Chip size="small" label={typeLabel} className={classes.chip} />}
           <Chip
             size="small"
-            label={t.isActive ? formatMessage('training.trainer.active') : formatMessage('no')}
+            label={formatMessage(t.isActive ? 'training.trainer.active' : 'training.trainer.inactive')}
             className={classes.chip}
           />
         </div>

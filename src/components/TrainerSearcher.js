@@ -3,7 +3,7 @@ import { bindActionCreators } from 'redux';
 import { connect, useSelector } from 'react-redux';
 import { injectIntl } from 'react-intl';
 import {
-  Grid, IconButton, Tooltip, Dialog, DialogContent, DialogActions, Button,
+  Grid, IconButton, Tooltip,
 } from '@material-ui/core';
 import { withTheme, withStyles, makeStyles } from '@material-ui/core/styles';
 import EditIcon from '@material-ui/icons/Edit';
@@ -20,7 +20,7 @@ import {
 } from '../constants';
 import { TrainerTypePicker } from '../pickers/ConstantPickers';
 import { defaultFilterStyles } from '../utils/styles';
-import TrainerProfileCard from './TrainerProfileCard';
+import TrainerPreviewDialog from './TrainerPreviewDialog';
 
 const Filter = injectIntl(withTheme(withStyles(defaultFilterStyles)(({ classes, filters, onChangeFilters }) => {
   const debounced = _debounce(onChangeFilters, DEFAULT_DEBOUNCE_TIME);
@@ -150,17 +150,11 @@ function TrainerSearcher({
 
   return (
     <>
-      <Dialog open={!!viewed} onClose={() => setViewed(null)} maxWidth="sm" fullWidth PaperProps={{ style: { borderRadius: 0 } }}>
-        <DialogContent style={{ padding: 0 }}>
-          {viewed && <TrainerProfileCard trainer={viewed} />}
-        </DialogContent>
-        <DialogActions>
-          {rights.includes(RIGHT_TRAINER_MANAGE) && (
-            <Button color="primary" onClick={() => open(viewed)}>{formatMessage('training.edit')}</Button>
-          )}
-          <Button onClick={() => setViewed(null)}>{formatMessage('training.close')}</Button>
-        </DialogActions>
-      </Dialog>
+      <TrainerPreviewDialog
+        trainer={viewed}
+        onClose={() => setViewed(null)}
+        onEdit={rights.includes(RIGHT_TRAINER_MANAGE) ? open : null}
+      />
       <div className={classes.searcher}>
         <Searcher
         module="training"
