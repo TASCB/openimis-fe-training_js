@@ -22,6 +22,10 @@ import { isPaaComplete } from '../utils/paa';
 
 const useStyles = makeStyles((theme) => ({ page: theme.page }));
 
+// Stepping back or stopping (reject, cancel, revise) is a plain text action; only the
+// step forward is filled, matching the approval pages.
+const SECONDARY_ACTIONS = ['reject', 'cancel', 'revise'];
+
 function TrainingPage({ trainingUuid }) {
   const classes = useStyles();
   const dispatch = useDispatch();
@@ -98,12 +102,13 @@ function TrainingPage({ trainingUuid }) {
 
   const actions = (!isNew ? (STATUS_ACTIONS[edited?.status] || []) : [])
     .filter((a) => rights.includes(a.right))
+    .sort((a, b) => Number(!SECONDARY_ACTIONS.includes(a.action)) - Number(!SECONDARY_ACTIONS.includes(b.action)))
     .map((a) => ({
       onlyIfNotDirty: true,
       tooltip: formatMessage(`training.action.${a.action}`),
       button: (
         <Button
-          variant="contained"
+          variant={SECONDARY_ACTIONS.includes(a.action) ? 'text' : 'contained'}
           color="primary"
           onClick={a.dialog ? () => setRescheduling(true) : () => onAction(a.action)}
         >

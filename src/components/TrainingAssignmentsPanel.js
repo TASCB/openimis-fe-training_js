@@ -117,6 +117,7 @@ function TrainingAssignmentsPanel({
               <TableCell>
                 <SelectInput
                   module="training"
+                  label="training.assignment.assigneeType"
                   options={ASSIGNEE_TYPES.map((t) => ({
                     value: t, label: formatMessage(`training.assignment.assigneeType.${t}`),
                   }))}
