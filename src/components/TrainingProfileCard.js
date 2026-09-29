@@ -10,7 +10,7 @@ import PublicOutlined from '@material-ui/icons/PublicOutlined';
 import PeopleOutline from '@material-ui/icons/PeopleOutline';
 import Check from '@material-ui/icons/Check';
 import { useModulesManager, useTranslations, formatDateFromISO } from '@openimis/fe-core';
-import { STATUS_COLORS } from '../constants';
+import { STATUS_CHIP_COLOR } from '../constants';
 
 // Region › District › Ward › Village, shown under the PAA it resolves to.
 const locationPath = (location) => {
@@ -93,7 +93,6 @@ function TrainingProfileCard({ training }) {
 
   const fmtDate = (v) => (v ? formatDateFromISO(modulesManager, intl, v) : null);
   const statusLabel = t.status ? formatMessage(`training.status.${t.status}`) : null;
-  const statusColor = STATUS_COLORS[t.status] || '#9e9e9e';
 
   // inclusive duration in days
   let duration = null;
@@ -122,7 +121,7 @@ function TrainingProfileCard({ training }) {
         </div>
         {statusLabel && (
           <span className={classes.pill}>
-            <span className={classes.pillDot} style={{ background: statusColor }} />
+            <span className={classes.pillDot} style={{ background: STATUS_CHIP_COLOR }} />
             {statusLabel}
           </span>
         )}

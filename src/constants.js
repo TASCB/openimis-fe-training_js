@@ -48,6 +48,9 @@ export const TRAINING_STATUS = {
 };
 export const TRAINING_STATUS_LIST = Object.values(TRAINING_STATUS);
 
+// Status badges are one neutral grey (openIMIS convention); STATUS_COLORS is for the calendar.
+export const STATUS_CHIP_COLOR = '#9e9e9e';
+
 export const STATUS_COLORS = {
   DRAFT: '#9e9e9e',
   SUBMITTED: '#1976d2',

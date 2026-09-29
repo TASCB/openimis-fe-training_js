@@ -1,7 +1,7 @@
 import React from 'react';
 import { Chip } from '@material-ui/core';
 import { useModulesManager, useTranslations } from '@openimis/fe-core';
-import { STATUS_COLORS } from '../constants';
+import { STATUS_CHIP_COLOR } from '../constants';
 
 function StatusChip({ status }) {
   const modulesManager = useModulesManager();
@@ -12,7 +12,7 @@ function StatusChip({ status }) {
     <Chip
       size="small"
       label={label}
-      style={{ backgroundColor: STATUS_COLORS[status] || '#9e9e9e', color: '#fff' }}
+      style={{ backgroundColor: STATUS_CHIP_COLOR, color: '#fff' }}
     />
   );
 }
