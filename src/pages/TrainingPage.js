@@ -118,7 +118,7 @@ function TrainingPage({ trainingUuid }) {
     }));
 
   const getPanels = () => {
-    const panels = [ConflictBanner];
+    const panels = [TrainingHeadPanel, ConflictBanner];
     if (!isNew) panels.push(TrainingTabs);
     return panels;
   };
@@ -140,7 +140,6 @@ function TrainingPage({ trainingUuid }) {
         save={save}
         canSave={canSave}
         saveTooltip={formatMessage('saveButton.tooltip')}
-        Panels={[TrainingHeadPanel]}
         Panels={getPanels()}
         actions={actions}
         readOnly={!canEditDetails}
