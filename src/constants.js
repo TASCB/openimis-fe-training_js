@@ -48,20 +48,7 @@ export const TRAINING_STATUS = {
 };
 export const TRAINING_STATUS_LIST = Object.values(TRAINING_STATUS);
 
-// Status badges are one neutral grey (openIMIS convention); STATUS_COLORS is for the calendar.
 export const STATUS_CHIP_COLOR = '#9e9e9e';
-
-export const STATUS_COLORS = {
-  DRAFT: '#9e9e9e',
-  SUBMITTED: '#1976d2',
-  APPROVED: '#0288d1',
-  REJECTED: '#d32f2f',
-  SCHEDULED: '#7b1fa2',
-  ONGOING: '#ed6c02',
-  COMPLETED: '#2e7d32',
-  CANCELLED: '#7f1d1d',
-  CLOSED: '#455a64',
-};
 
 export const TRAINER_TYPE_INTERNAL = 'INTERNAL';
 export const TRAINER_TYPE_LIST = [TRAINER_TYPE_INTERNAL, 'EXTERNAL'];

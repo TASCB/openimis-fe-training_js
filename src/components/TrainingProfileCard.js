@@ -116,7 +116,7 @@ function TrainingProfileCard({ training }) {
       <div className={classes.header}>
         <div className={classes.badge}><School fontSize="medium" /></div>
         <div style={{ flexGrow: 1, minWidth: 0 }}>
-          <div className={classes.eyebrow}>{formatMessage('training.record.eyebrow')}{t.code ? ` · ${t.code}` : ''}</div>
+          <div className={classes.eyebrow}>{formatMessage('training.record.eyebrow')}</div>
           <div className={classes.title}>{t.title}</div>
         </div>
         {statusLabel && (

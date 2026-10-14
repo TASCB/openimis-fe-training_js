@@ -3,9 +3,10 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { Grid } from '@material-ui/core';
 import _debounce from 'lodash/debounce';
-import { WarningBox, useModulesManager, useTranslations } from '@openimis/fe-core';
+import { useModulesManager, useTranslations, useHistory } from '@openimis/fe-core';
+import { ConflictPanel } from '@openimis/fe-tasaf_common';
 import { fetchTrainingConflicts, clearTrainingConflicts, decId } from '../actions';
-import { DEFAULT_DEBOUNCE_TIME } from '../constants';
+import { DEFAULT_DEBOUNCE_TIME, TRAINING_ROUTE_TRAINING } from '../constants';
 import { toISO } from '../utils/dates';
 
 function ConflictBanner({
@@ -13,10 +14,10 @@ function ConflictBanner({
   fetchTrainingConflicts, clearTrainingConflicts,
 }) {
   const modulesManager = useModulesManager();
+  const history = useHistory();
   const { formatMessage } = useTranslations('training', modulesManager);
 
-  // trainingAssignments is a shared slice holding whichever training was opened last and is never
-  // cleared, so match each row to the training being edited before conflict-checking its trainers.
+  // trainingAssignments is never cleared, so keep only rows of the training being edited.
   const ownAssignments = useMemo(() => {
     const editedId = decId(edited?.id);
     if (!editedId) return [];
@@ -55,27 +56,18 @@ function ConflictBanner({
     // the ids themselves, not their count — swapping one trainer for another must re-check
     trainerIds.join(), staffUserIds.join()]);
 
-  const hard = (trainingConflicts ?? []).filter((c) => c.hard);
-  const soft = (trainingConflicts ?? []).filter((c) => !c.hard);
-  if (!hard.length && !soft.length) return null;
-
-  const HARD_STYLES = { backgroundColor: '#fdecea', borderLeft: '5px solid #c62828' };
-
+  if (!(trainingConflicts ?? []).length) return null;
   return (
     <Grid container>
-      {hard.length > 0 && (
-        <WarningBox
-          title={formatMessage('training.conflict.hardTitle')}
-          description={hard.map((c) => c.message).join('  •  ')}
-          styles={HARD_STYLES}
-        />
-      )}
-      {soft.length > 0 && (
-        <WarningBox
-          title={formatMessage('training.conflict.softTitle')}
-          description={soft.map((c) => c.message).join('  •  ')}
-        />
-      )}
+      <ConflictPanel
+        conflicts={trainingConflicts}
+        hardTitle={formatMessage('training.conflict.hardTitle')}
+        softTitle={formatMessage('training.conflict.softTitle')}
+        viewLabel={formatMessage('training.conflict.open')}
+        hrefFor={(c) => (c.conflictingTrainingId
+          ? history.createHref({ pathname: `/${modulesManager.getRef(TRAINING_ROUTE_TRAINING)}/${c.conflictingTrainingId}` })
+          : null)}
+      />
     </Grid>
   );
 }

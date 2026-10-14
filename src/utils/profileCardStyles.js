@@ -56,7 +56,6 @@ export const useProfileCardStyles = makeStyles((theme) => {
     },
     block: {
       backgroundColor: theme.palette.grey[50],
-      borderLeft: `4px solid ${main}`,
       borderRadius: 4,
       padding: theme.spacing(1.5, 2),
       whiteSpace: 'pre-wrap',

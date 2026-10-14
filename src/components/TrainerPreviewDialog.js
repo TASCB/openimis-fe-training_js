@@ -30,7 +30,7 @@ const useStyles = makeStyles((theme) => {
       '&:hover': { borderColor: teal },
     },
     bio: {
-      padding: '12px 16px', borderLeft: `3px solid ${teal}`, background: PREVIEW_PANEL, borderRadius: '0 10px 10px 0',
+      padding: '12px 16px', background: PREVIEW_PANEL, borderRadius: 10,
     },
   };
 });

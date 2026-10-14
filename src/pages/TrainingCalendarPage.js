@@ -6,7 +6,7 @@ import {
 } from '@openimis/fe-core';
 import { ModuleCalendar } from '@openimis/fe-tasaf_common';
 import {
-  MODULE_NAME, STATUS_COLORS, TRAINING_STATUS_LIST, CALENDAR_SOURCE_COLORS,
+  MODULE_NAME, TRAINING_STATUS_LIST, CALENDAR_SOURCE_COLORS,
   TRAINING_ROUTE_TRAINING, RIGHT_TRAINING_CREATE, RIGHT_UNIFIED_CALENDAR_VIEW,
 } from '../constants';
 import { fetchTrainingCalendar, fetchUnifiedCalendar } from '../actions';
@@ -37,7 +37,6 @@ function TrainingCalendarPage() {
         fetching={fetching}
         error={error}
         onFetchRange={(from, to) => dispatch(fetchTrainingCalendar({ dateFrom: toISO(from), dateTo: toISO(to, true) }))}
-        statusColors={STATUS_COLORS}
         statusList={TRAINING_STATUS_LIST}
         onFetchUnifiedRange={canSeeUnified
           ? (from, to) => dispatch(fetchUnifiedCalendar({ dateFrom: toISO(from), dateTo: toISO(to, true) }))
