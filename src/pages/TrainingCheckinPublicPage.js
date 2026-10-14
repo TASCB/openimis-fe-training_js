@@ -7,11 +7,9 @@ import ArrowForward from '@material-ui/icons/ArrowForward';
 import CheckCircleOutline from '@material-ui/icons/CheckCircleOutline';
 import EventBusy from '@material-ui/icons/EventBusy';
 import PersonOutline from '@material-ui/icons/PersonOutline';
-import WcOutlined from '@material-ui/icons/Wc';
 import MailOutline from '@material-ui/icons/MailOutline';
 import BusinessOutlined from '@material-ui/icons/BusinessOutlined';
 import WorkOutline from '@material-ui/icons/WorkOutline';
-import ExpandMore from '@material-ui/icons/ExpandMore';
 import EventOutlined from '@material-ui/icons/EventOutlined';
 import PlaceOutlined from '@material-ui/icons/PlaceOutlined';
 import ConfirmationNumberOutlined from '@material-ui/icons/ConfirmationNumberOutlined';
@@ -58,12 +56,21 @@ const useStyles = makeStyles({
     position: 'relative', overflow: 'hidden', color: T.white,
     background: `radial-gradient(1200px 400px at 78% -10%, rgba(122,208,194,.14), transparent 60%), linear-gradient(155deg, ${T.forest} 0%, #015043 60%, ${T.primary} 100%)`,
     padding: '56px 24px 64px',
+    '@media (max-width: 900px)': { padding: '22px 18px 26px' },
   },
   heroInner: { maxWidth: 1120, margin: '0 auto' },
-  h1: { fontSize: 46, lineHeight: 1.06, fontWeight: 800, margin: '0 0 14px', maxWidth: 640, letterSpacing: -0.5 },
+  h1: {
+    fontSize: 46, lineHeight: 1.06, fontWeight: 800, margin: '0 0 14px', maxWidth: 640, letterSpacing: -0.5,
+    '@media (max-width: 900px)': { fontSize: 26, margin: '0 0 6px' },
+  },
   h1accent: { color: T.accent },
-  heroSub: { fontSize: 17, lineHeight: 1.55, color: '#d7e6dd', maxWidth: 560, margin: 0 },
-  ctaRow: { display: 'flex', gap: 12, marginTop: 28, flexWrap: 'wrap' },
+  heroSub: {
+    fontSize: 17, lineHeight: 1.55, color: '#d7e6dd', maxWidth: 560, margin: 0,
+    '@media (max-width: 900px)': { fontSize: 14 },
+  },
+  ctaRow: {
+    display: 'flex', gap: 12, marginTop: 28, flexWrap: 'wrap', '@media (max-width: 900px)': { display: 'none' },
+  },
   btnPrimary: {
     display: 'inline-flex', alignItems: 'center', gap: 8, cursor: 'pointer',
     background: T.white, color: T.primary, border: 0, borderRadius: 10, padding: '13px 20px',
@@ -99,6 +106,11 @@ const useStyles = makeStyles({
     boxShadow: '0 18px 40px rgba(6,56,31,.08)',
     '@media (max-width: 430px)': { padding: 18 },
   },
+  formCard: { '@media (max-width: 900px)': { order: -1 } },
+  summary: {
+    fontSize: 13, color: T.muted, margin: '0 0 14px', paddingBottom: 12, borderBottom: `1px solid ${T.border}`,
+  },
+  summaryTitle: { display: 'block', fontSize: 14.5, fontWeight: 700, color: T.ink },
   cardTitle: { fontSize: 20, fontWeight: 800, color: T.ink, margin: '0 0 4px' },
   cardHint: { fontSize: 13, color: T.muted, margin: '0 0 18px' },
 
@@ -125,25 +137,13 @@ const useStyles = makeStyles({
     flex: 1, border: 'none', background: 'none', outline: 'none', padding: '11px 12px', borderRadius: 9,
     fontFamily: T.body, fontSize: 14.5, color: T.ink, '&::placeholder': { color: '#9aa8a0' },
   },
-  selectBox: {
-    width: '100%', display: 'flex', alignItems: 'center', gap: 10, padding: '11px 12px 11px 36px', position: 'relative',
-    borderRadius: 9, border: `1px solid ${T.border}`, background: T.white, cursor: 'pointer', fontSize: 14.5,
+  choices: { display: 'flex', gap: 10 },
+  choice: {
+    flex: 1, padding: '11px 12px', borderRadius: 9, border: `1px solid ${T.border}`, background: T.white,
+    fontFamily: T.body, fontSize: 14.5, color: T.ink, cursor: 'pointer',
     '&:focus-visible': { outline: 'none', borderColor: T.primary, boxShadow: '0 0 0 3px rgba(0,105,92,.18)' },
   },
-  selectVal: { flex: 1, color: T.ink },
-  selectPlaceholder: { flex: 1, color: '#9aa8a0' },
-  menuWrap: { position: 'relative' },
-  backdrop: { position: 'fixed', inset: 0, zIndex: 40 },
-  menu: {
-    position: 'absolute', top: 'calc(100% + 6px)', left: 0, right: 0, zIndex: 50,
-    background: T.white, border: `1px solid ${T.border}`, borderRadius: 10, overflow: 'hidden',
-    boxShadow: '0 12px 30px rgba(6,56,31,.16)', padding: 4,
-  },
-  menuItem: {
-    padding: '10px 12px', fontSize: 14.5, color: T.ink, cursor: 'pointer', borderRadius: 7, transition: 'background .12s, color .12s',
-    '&:hover': { background: 'rgba(0,105,92,.08)' },
-  },
-  menuItemSel: { background: T.primary, color: T.white, '&:hover': { background: T.primary } },
+  choiceSel: { background: T.primary, borderColor: T.primary, color: T.white, fontWeight: 700 },
 
   hp: { position: 'absolute', left: -9999, width: 1, height: 1, overflow: 'hidden' },
   errText: { display: 'flex', alignItems: 'center', gap: 5, color: '#c0392b', fontSize: 12.5, fontWeight: 600, marginTop: 10 },
@@ -160,6 +160,9 @@ const useStyles = makeStyles({
 
   state: { textAlign: 'center', padding: '32px 18px' },
   stateTitle: { fontSize: 19, fontWeight: 800, color: T.ink, marginTop: 10 },
+  passName: { fontSize: 22, fontWeight: 800, color: T.primary, marginTop: 14 },
+  passMeta: { fontSize: 14, color: T.muted, marginTop: 4 },
+  passHint: { fontSize: 13, color: T.muted, marginTop: 16 },
 });
 
 const normalizePhone = (raw) => {
@@ -211,19 +214,9 @@ function TrainingCheckinPublicPage(props) {
   const [form, setForm] = useState(initialForm);
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(null);
+  const [checkedInAt, setCheckedInAt] = useState(null);
   const [error, setError] = useState(null);
   const [showFullDesc, setShowFullDesc] = useState(false);
-  const [genderOpen, setGenderOpen] = useState(false);
-
-  useEffect(() => {
-    const id = 'tasaf-dmsans-font';
-    if (!document.getElementById(id)) {
-      const l = document.createElement('link');
-      l.id = id; l.rel = 'stylesheet';
-      l.href = 'https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap';
-      document.head.appendChild(l);
-    }
-  }, []);
 
   useEffect(() => {
     let alive = true;
@@ -245,6 +238,9 @@ function TrainingCheckinPublicPage(props) {
     if (!phone) {
       setError(fm('training.checkin.phoneInvalid')); return;
     }
+    if (form.email.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) {
+      setError(fm('training.checkin.emailInvalid')); return;
+    }
     setSubmitting(true);
     fetch(`/api/training/checkin/${token}`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...form, phone }),
@@ -258,6 +254,7 @@ function TrainingCheckinPublicPage(props) {
         if (d?.error === 'missing_fields') { setError(fm('training.checkin.requiredError')); return; }
         if (status >= 400) { setError(fm('training.checkin.submitError')); return; }
         setDone(d.already ? 'already' : 'ok');
+        setCheckedInAt(new Date());
       })
       .catch(() => { setSubmitting(false); setError(fm('training.checkin.submitError')); });
   };
@@ -360,7 +357,11 @@ function TrainingCheckinPublicPage(props) {
           <div>
             <div className={showFullDesc ? classes.descFull : classes.desc}>{info.training.description}</div>
             {info.training.description.length > 130 && (
-              <span className={classes.readMore} role="button" tabIndex={0} onClick={() => setShowFullDesc(!showFullDesc)}>
+              <span
+                className={classes.readMore} role="button" tabIndex={0}
+                onClick={() => setShowFullDesc(!showFullDesc)}
+                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setShowFullDesc(!showFullDesc); }}
+              >
                 {fm(showFullDesc ? 'training.checkin.readLess' : 'training.checkin.readMore')}
               </span>
             )}
@@ -395,11 +396,16 @@ function TrainingCheckinPublicPage(props) {
       <div className={classes.cols}>
         <SessionDetails />
 
-        <div id="tc-form" className={classes.card}>
+        <div id="tc-form" className={`${classes.card} ${classes.formCard}`}>
           {done ? (
             <div className={classes.state}>
               <CheckCircleOutline style={{ fontSize: 60, color: '#2e7d32' }} />
               <div className={classes.stateTitle}>{fm(done === 'already' ? 'training.checkin.already' : 'training.checkin.success')}</div>
+              <div className={classes.passName}>{form.full_name}</div>
+              <div className={classes.passMeta}>
+                {[s.title, checkedInAt && checkedInAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })].filter(Boolean).join(' · ')}
+              </div>
+              <div className={classes.passHint}>{fm('training.checkin.showAtDoor')}</div>
             </div>
           ) : !info?.isOpen ? (
             <div className={classes.state}>
@@ -408,6 +414,10 @@ function TrainingCheckinPublicPage(props) {
             </div>
           ) : (
             <>
+              <p className={classes.summary}>
+                <span className={classes.summaryTitle}>{info?.training?.title}</span>
+                {[s.title, dateStr, s.startTime].filter(Boolean).join(' · ')}
+              </p>
               <h2 className={classes.cardTitle}>{fm('training.checkin.formTitle')}</h2>
               <p className={classes.cardHint}>{fm('training.checkin.requiredNote')}</p>
 
@@ -432,31 +442,16 @@ function TrainingCheckinPublicPage(props) {
                 <span className={classes.label}>
                   {fm('training.checkin.gender')}<span className={classes.opt}>({fm('training.checkin.optional')})</span>
                 </span>
-                <div className={classes.menuWrap}>
-                  <div className={classes.selectBox} role="button" tabIndex={0} onClick={() => setGenderOpen((o) => !o)}>
-                    <WcOutlined className={classes.inputIcon} style={{ fontSize: 18 }} />
-                    {form.gender
-                      ? <span className={classes.selectVal}>{fm(`training.checkin.gender.${form.gender}`)}</span>
-                      : <span className={classes.selectPlaceholder}>{fm('training.checkin.selectPh')}</span>}
-                    <ExpandMore fontSize="small" style={{ color: T.muted, transform: genderOpen ? 'rotate(180deg)' : 'none', transition: 'transform .15s' }} />
-                  </div>
-                  {genderOpen && (
-                    <>
-                      <div className={classes.backdrop} onClick={() => setGenderOpen(false)} />
-                      <div className={classes.menu}>
-                        {[['', 'training.checkin.selectPh'],
-                          ...GENDER_LIST.map((g) => [g, `training.checkin.gender.${g}`])].map(([val, key]) => (
-                          <div
-                            key={val || 'none'}
-                            className={`${classes.menuItem} ${form.gender === val ? classes.menuItemSel : ''}`}
-                            onClick={() => { setForm({ ...form, gender: val }); setGenderOpen(false); }}
-                          >
-                            {fm(key)}
-                          </div>
-                        ))}
-                      </div>
-                    </>
-                  )}
+                <div className={classes.choices} role="radiogroup" aria-label={fm('training.checkin.gender')}>
+                  {GENDER_LIST.map((g) => (
+                    <button
+                      key={g} type="button" role="radio" aria-checked={form.gender === g}
+                      className={`${classes.choice} ${form.gender === g ? classes.choiceSel : ''}`}
+                      onClick={() => setForm((f) => ({ ...f, gender: f.gender === g ? '' : g }))}
+                    >
+                      {fm(`training.checkin.gender.${g}`)}
+                    </button>
+                  ))}
                 </div>
               </div>
 
