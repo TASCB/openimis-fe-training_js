@@ -246,6 +246,8 @@
   "training.checkin.closed": "Registration for this session is closed.",
   "training.checkin.notFound": "This check-in link is not valid.",
   "training.checkin.requiredError": "Full name and phone are required.",
+  "training.checkin.phoneInvalid": "Enter a valid mobile number, e.g. 712 345 678",
+  "training.checkin.rateLimited": "Too many attempts. Please wait a minute and try again.",
   "training.checkin.submitError": "Could not check you in. Please try again.",
   "training.materials.title": "Materials",
   "training.evidence.title": "Evidence",

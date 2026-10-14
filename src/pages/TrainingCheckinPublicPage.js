@@ -162,6 +162,13 @@ const useStyles = makeStyles({
   stateTitle: { fontSize: 19, fontWeight: 800, color: T.ink, marginTop: 10 },
 });
 
+const normalizePhone = (raw) => {
+  let d = (raw || '').replace(/\D/g, '');
+  if (d.startsWith('255') && d.length === 12) d = `0${d.slice(3)}`;
+  else if (d.length === 9) d = `0${d}`;
+  return /^0[67]\d{8}$/.test(d) ? d : null;
+};
+
 const initialForm = { full_name: '', gender: '', phone: '', email: '', organization: '', title: '', hp: '' };
 
 // Top-level (stable) field — defining it inside the page would blur inputs each keystroke.
@@ -234,14 +241,21 @@ function TrainingCheckinPublicPage(props) {
     if (!form.full_name.trim() || !form.phone.trim()) {
       setError(fm('training.checkin.requiredError')); return;
     }
+    const phone = normalizePhone(form.phone);
+    if (!phone) {
+      setError(fm('training.checkin.phoneInvalid')); return;
+    }
     setSubmitting(true);
     fetch(`/api/training/checkin/${token}`, {
-      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(form),
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...form, phone }),
     })
       .then((r) => r.json().then((d) => ({ status: r.status, d })))
       .then(({ status, d }) => {
         setSubmitting(false);
         if (status === 403) { setError(fm('training.checkin.closed')); return; }
+        if (status === 429) { setError(fm('training.checkin.rateLimited')); return; }
+        if (d?.error === 'invalid_phone') { setError(fm('training.checkin.phoneInvalid')); return; }
+        if (d?.error === 'missing_fields') { setError(fm('training.checkin.requiredError')); return; }
         if (status >= 400) { setError(fm('training.checkin.submitError')); return; }
         setDone(d.already ? 'already' : 'ok');
       })
