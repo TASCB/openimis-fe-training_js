@@ -3,14 +3,15 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import {
   Table, TableHead, TableRow, TableCell, TableBody,
-  IconButton, Button, Tooltip, Chip,
+  IconButton, Button, Tooltip, Chip, Grid, Typography, Divider,
 } from '@material-ui/core';
-import DeleteIcon from '@material-ui/icons/Delete';
+import { makeStyles } from '@material-ui/core/styles';
+import DeleteIcon from '@material-ui/icons/DeleteOutline';
 import CropFreeIcon from '@material-ui/icons/CropFree';
 import { useIntl } from 'react-intl';
 import {
   TextInput, PublishedComponent, formatDateFromISO,
-  useModulesManager, useTranslations, journalize,
+  useModulesManager, useTranslations, journalize, coreConfirm, clearConfirm,
 } from '@openimis/fe-core';
 import {
   fetchTrainingSessions, saveTrainingSession, deleteTrainingSession,
@@ -22,19 +23,30 @@ import AttendanceQRDialog from './AttendanceQRDialog';
 import TimeInput from './TimeInput';
 import { qrStateKey } from '../utils/checkin';
 
+const useStyles = makeStyles((theme) => ({
+  form: { padding: theme.spacing(1, 0) },
+  item: theme.paper.item,
+  formTitle: { color: theme.palette.primary.main, fontWeight: 500 },
+  actions: { display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: theme.spacing(2) },
+  hint: { color: theme.palette.error.main, fontSize: 13 },
+  empty: { color: theme.palette.text.secondary, textAlign: 'center', padding: theme.spacing(3) },
+}));
+
 const EMPTY = { title: '', sessionDate: '', startTime: '', endTime: '' };
 
 const hhmm = (t) => (t ? String(t).slice(0, 5) : '');
 
 function TrainingSessionsPanel({
   trainingId, sessionsReadOnly: readOnly, trainingSessions, rights,
-  submittingMutation, mutation,
-  fetchTrainingSessions, saveTrainingSession, deleteTrainingSession, journalize,
+  submittingMutation, mutation, confirmed,
+  fetchTrainingSessions, saveTrainingSession, deleteTrainingSession, journalize, coreConfirm, clearConfirm,
 }) {
+  const classes = useStyles();
   const modulesManager = useModulesManager();
   const intl = useIntl();
-  const { formatMessage } = useTranslations('training', modulesManager);
+  const { formatMessage, formatMessageWithValues } = useTranslations('training', modulesManager);
   const [row, setRow] = useState(EMPTY);
+  const [toDelete, setToDelete] = useState(null);
   const [qrSessionId, setQrSessionId] = useState(null);
   const prev = useRef();
 
@@ -51,8 +63,9 @@ function TrainingSessionsPanel({
   }, [submittingMutation]);
   useEffect(() => { prev.current = submittingMutation; });
 
+  const endBeforeStart = !!(row.startTime && row.endTime && row.endTime <= row.startTime);
   const add = () => {
-    if (!row.title) return;
+    if (!row.title || endBeforeStart) return;
     saveTrainingSession(
       {
         trainingId,
@@ -70,12 +83,62 @@ function TrainingSessionsPanel({
     { id: s.id, trainingId, registrationOpen: !s.registrationOpen },
     formatMessage('training.session.toggle.mutationLabel'),
   );
-  const remove = (s) => deleteTrainingSession(s, formatMessage('training.session.delete.mutationLabel'));
+  useEffect(() => {
+    if (toDelete) {
+      coreConfirm(
+        formatMessage('training.session.deleteDialog.title'),
+        formatMessageWithValues('training.session.deleteDialog.message', { name: toDelete.title }),
+      );
+    }
+  }, [toDelete]);
+  useEffect(() => {
+    if (toDelete && confirmed) deleteTrainingSession(toDelete, formatMessage('training.session.delete.mutationLabel'));
+    if (confirmed !== null) setToDelete(null);
+    return () => confirmed !== null && clearConfirm(false);
+  }, [confirmed]);
+  const items = trainingSessions ?? [];
 
   const qrSession = (trainingSessions ?? []).find((s) => s.id === qrSessionId) || null;
 
   return (
     <>
+      {canCreate && (
+        <>
+          <Grid container className={classes.form} alignItems="flex-end">
+            <Grid item xs={12} className={classes.item}>
+              <Typography className={classes.formTitle}>{formatMessage('training.session.formTitle')}</Typography>
+            </Grid>
+            <Grid item xs={12} md={5} className={classes.item}>
+              <TextInput module="training" label="training.session.title" required
+                value={row.title} onChange={(v) => setRow((r) => ({ ...r, title: v }))} />
+            </Grid>
+            <Grid item xs={12} md={3} className={classes.item}>
+              <PublishedComponent
+                pubRef="core.DatePicker"
+                module="training"
+                label="training.session.date"
+                value={row.sessionDate || null}
+                onChange={(v) => setRow((r) => ({ ...r, sessionDate: v || '' }))}
+              />
+            </Grid>
+            <Grid item xs={6} md={2} className={classes.item}>
+              <TimeInput label="training.session.startTime" value={row.startTime}
+                onChange={(v) => setRow((r) => ({ ...r, startTime: v }))} />
+            </Grid>
+            <Grid item xs={6} md={2} className={classes.item}>
+              <TimeInput label="training.session.endTime" value={row.endTime}
+                onChange={(v) => setRow((r) => ({ ...r, endTime: v }))} />
+            </Grid>
+            <Grid item xs={12} className={`${classes.item} ${classes.actions}`}>
+              {endBeforeStart && <span className={classes.hint}>{formatMessage('training.session.endBeforeStart')}</span>}
+              <Button variant="contained" color="primary" onClick={add} disabled={!row.title || endBeforeStart}>
+                {formatMessage('training.session.formTitle')}
+              </Button>
+            </Grid>
+          </Grid>
+          <Divider />
+        </>
+      )}
       <Table size="small">
         <TableHead>
           <TableRow>
@@ -88,7 +151,12 @@ function TrainingSessionsPanel({
           </TableRow>
         </TableHead>
         <TableBody>
-          {(trainingSessions ?? []).map((s) => (
+          {!items.length && (
+            <TableRow>
+              <TableCell colSpan={6} className={classes.empty}>{formatMessage('training.session.empty')}</TableCell>
+            </TableRow>
+          )}
+          {items.map((s) => (
             <TableRow key={s.id}>
               <TableCell>{s.title}</TableCell>
               <TableCell>
@@ -112,45 +180,12 @@ function TrainingSessionsPanel({
               <TableCell>
                 {canDelete && (
                   <Tooltip title={formatMessage('deleteButton.tooltip')}>
-                    <IconButton size="small" onClick={() => remove(s)}><DeleteIcon /></IconButton>
+                    <IconButton size="small" onClick={() => setToDelete(s)}><DeleteIcon /></IconButton>
                   </Tooltip>
                 )}
               </TableCell>
             </TableRow>
           ))}
-          {canCreate && (
-            <TableRow>
-              <TableCell>
-                <TextInput module="training" value={row.title} onChange={(v) => setRow({ ...row, title: v })} />
-              </TableCell>
-              <TableCell>
-                <PublishedComponent
-                  pubRef="core.DatePicker"
-                  module="training"
-                  value={row.sessionDate || null}
-                  onChange={(v) => setRow({ ...row, sessionDate: v || '' })}
-                />
-              </TableCell>
-              <TableCell>
-                <div style={{ display: 'flex', gap: 4 }}>
-                  <TimeInput
-                    value={row.startTime}
-                    onChange={(v) => setRow({ ...row, startTime: v })}
-                  />
-                  <TimeInput
-                    value={row.endTime}
-                    onChange={(v) => setRow({ ...row, endTime: v })}
-                  />
-                </div>
-              </TableCell>
-              <TableCell colSpan={2} />
-              <TableCell>
-                <Button variant="contained" size="small" color="primary" onClick={add} disabled={!row.title}>
-                  {formatMessage('addButton')}
-                </Button>
-              </TableCell>
-            </TableRow>
-          )}
         </TableBody>
       </Table>
 
@@ -170,10 +205,11 @@ const mapStateToProps = (state) => ({
   rights: state.core?.user?.i_user?.rights ?? [],
   submittingMutation: state.training.submittingMutation,
   mutation: state.training.mutation,
+  confirmed: state.core.confirmed,
 });
 const mapDispatchToProps = (dispatch) => bindActionCreators(
   {
-    fetchTrainingSessions, saveTrainingSession, deleteTrainingSession, journalize,
+    fetchTrainingSessions, saveTrainingSession, deleteTrainingSession, journalize, coreConfirm, clearConfirm,
   }, dispatch,
 );
 

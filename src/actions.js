@@ -418,7 +418,8 @@ function uploadFile(path, { trainingId, file, description, evidenceType }) {
   if (description) form.append('description', description);
   if (evidenceType) form.append('evidence_type', evidenceType);
   return fetch(`${baseApiUrl}${path}`, { method: 'POST', body: form, credentials: 'include' })
-    .then((res) => res.json());
+    .then((res) => res.json().catch(() => ({ success: false, error: `HTTP ${res.status}` })))
+    .catch((e) => ({ success: false, error: e.message }));
 }
 
 export const uploadTrainingMaterial = (args) => uploadFile('/training/materials/upload/', args);

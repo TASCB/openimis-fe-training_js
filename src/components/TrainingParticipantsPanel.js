@@ -3,11 +3,13 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import {
   Table, TableHead, TableRow, TableCell, TableBody,
-  IconButton, Button, Tooltip,
+  IconButton, Button, Tooltip, Grid, Typography, Divider,
 } from '@material-ui/core';
-import DeleteIcon from '@material-ui/icons/Delete';
+import { makeStyles } from '@material-ui/core/styles';
+import DeleteIcon from '@material-ui/icons/DeleteOutline';
 import {
   PublishedComponent, SelectInput, TextInput, useModulesManager, useTranslations, journalize,
+  coreConfirm, clearConfirm,
 } from '@openimis/fe-core';
 import { userDisplayName } from '../utils/users';
 import {
@@ -16,6 +18,14 @@ import {
 } from '../actions';
 import { AttendanceStatusPicker, GenderPicker } from '../pickers/ConstantPickers';
 import ParticipantCategoryPicker from '../pickers/ParticipantCategoryPicker';
+
+const useStyles = makeStyles((theme) => ({
+  form: { padding: theme.spacing(1, 0) },
+  item: theme.paper.item,
+  formTitle: { color: theme.palette.primary.main, fontWeight: 500 },
+  actions: { display: 'flex', justifyContent: 'flex-end' },
+  empty: { color: theme.palette.text.secondary, textAlign: 'center', padding: theme.spacing(3) },
+}));
 
 const EMPTY = {
   fullName: '',
@@ -30,12 +40,14 @@ const EMPTY = {
 
 function TrainingParticipantsPanel({
   trainingId, participantReadOnly: readOnly, levelCode, trainingParticipants, trainingSessions,
-  submittingMutation, mutation, fetchTrainingParticipants, fetchTrainingSessions,
-  saveTrainingParticipant, deleteTrainingParticipant, journalize,
+  submittingMutation, mutation, confirmed, fetchTrainingParticipants, fetchTrainingSessions,
+  saveTrainingParticipant, deleteTrainingParticipant, journalize, coreConfirm, clearConfirm,
 }) {
+  const classes = useStyles();
   const modulesManager = useModulesManager();
-  const { formatMessage } = useTranslations('training', modulesManager);
+  const { formatMessage, formatMessageWithValues } = useTranslations('training', modulesManager);
   const [row, setRow] = useState(EMPTY);
+  const [toDelete, setToDelete] = useState(null);
   const prev = useRef();
 
   useEffect(() => {
@@ -52,25 +64,35 @@ function TrainingParticipantsPanel({
   }, [submittingMutation]);
   useEffect(() => { prev.current = submittingMutation; });
 
-  const pickInternalUser = (v) => setRow({
-    ...row,
+  const pickInternalUser = (v) => setRow((r) => ({
+    ...r,
     internalUser: v ?? null,
-    fullName: row.fullName || userDisplayName(v),
-  });
+    fullName: r.fullName || userDisplayName(v),
+  }));
 
   const add = () => {
     if (!row.fullName) return;
     saveTrainingParticipant({ ...row, trainingId }, formatMessage('training.participant.add.mutationLabel'));
     setRow(EMPTY);
   };
-  // Partial update — the mutation only touches the fields it is given.
   const updateField = (p, patch) => saveTrainingParticipant(
     { id: p.id, trainingId, ...patch }, formatMessage('training.participant.update.mutationLabel'),
   );
-  const remove = (p) => deleteTrainingParticipant(p, formatMessage('training.participant.delete.mutationLabel'));
+  useEffect(() => {
+    if (toDelete) {
+      coreConfirm(
+        formatMessage('training.participant.deleteDialog.title'),
+        formatMessageWithValues('training.participant.deleteDialog.message', { name: toDelete.fullName }),
+      );
+    }
+  }, [toDelete]);
+  useEffect(() => {
+    if (toDelete && confirmed) deleteTrainingParticipant(toDelete, formatMessage('training.participant.delete.mutationLabel'));
+    if (confirmed !== null) setToDelete(null);
+    return () => confirmed !== null && clearConfirm(false);
+  }, [confirmed]);
+  const items = trainingParticipants ?? [];
 
-  // Which register a new row lands in. Blank = a whole-training entry, which is what
-  // manual entries have always been; a session makes it that day's attendance register.
   const sessionOptions = [
     { value: '', label: formatMessage('training.participant.wholeTraining') },
     ...(trainingSessions ?? []).map((s) => ({ value: s.id, label: s.title })),
@@ -78,16 +100,64 @@ function TrainingParticipantsPanel({
 
   return (
     <>
-      {!readOnly && sessionOptions.length > 1 && (
-        <div style={{ maxWidth: 320, padding: '8px 0 4px' }}>
-          <SelectInput
-            module="training"
-            label="training.participant.addToSession"
-            options={sessionOptions}
-            value={row.sessionId}
-            onChange={(v) => setRow({ ...row, sessionId: v ?? '' })}
-          />
-        </div>
+      {!readOnly && (
+        <>
+          <Grid container className={classes.form}>
+            <Grid item xs={12} className={classes.item}>
+              <Typography className={classes.formTitle}>{formatMessage('training.participant.formTitle')}</Typography>
+            </Grid>
+            {sessionOptions.length > 1 && (
+              <Grid item xs={12} md={3} className={classes.item}>
+                <SelectInput
+                  module="training"
+                  label="training.participant.addToSession"
+                  options={sessionOptions}
+                  value={row.sessionId}
+                  onChange={(v) => setRow((r) => ({ ...r, sessionId: v ?? '' }))}
+                />
+              </Grid>
+            )}
+            <Grid item xs={12} md={3} className={classes.item}>
+              <PublishedComponent
+                pubRef="admin.UserPicker"
+                module="training"
+                withLabel
+                label={formatMessage('training.participant.internalUser')}
+                value={row.internalUser}
+                onChange={pickInternalUser}
+              />
+            </Grid>
+            <Grid item xs={12} md={sessionOptions.length > 1 ? 4 : 6} className={classes.item}>
+              <TextInput module="training" label="training.participant.fullName" required
+                value={row.fullName} onChange={(v) => setRow((r) => ({ ...r, fullName: v }))} />
+            </Grid>
+            <Grid item xs={6} md={2} className={classes.item}>
+              <GenderPicker withLabel withNull value={row.gender} onChange={(v) => setRow((r) => ({ ...r, gender: v || null }))} />
+            </Grid>
+            <Grid item xs={12} md={3} className={classes.item}>
+              <ParticipantCategoryPicker withLabel levelCode={levelCode} value={row.category}
+                onChange={(v) => setRow((r) => ({ ...r, category: v }))} />
+            </Grid>
+            <Grid item xs={12} md={3} className={classes.item}>
+              <TextInput module="training" label="training.participant.organization"
+                value={row.organization} onChange={(v) => setRow((r) => ({ ...r, organization: v }))} />
+            </Grid>
+            <Grid item xs={6} md={3} className={classes.item}>
+              <TextInput module="training" label="training.participant.phone"
+                value={row.phone} onChange={(v) => setRow((r) => ({ ...r, phone: v }))} />
+            </Grid>
+            <Grid item xs={6} md={3} className={classes.item}>
+              <AttendanceStatusPicker withLabel value={row.attendanceStatus}
+                onChange={(v) => setRow((r) => ({ ...r, attendanceStatus: v || EMPTY.attendanceStatus }))} />
+            </Grid>
+            <Grid item xs={12} className={`${classes.item} ${classes.actions}`}>
+              <Button variant="contained" color="primary" onClick={add} disabled={!row.fullName}>
+                {formatMessage('training.participant.formTitle')}
+              </Button>
+            </Grid>
+          </Grid>
+          <Divider />
+        </>
       )}
       <Table size="small">
         <TableHead>
@@ -104,90 +174,38 @@ function TrainingParticipantsPanel({
           </TableRow>
         </TableHead>
         <TableBody>
-          {(trainingParticipants ?? []).map((p) => (
+          {!items.length && (
+            <TableRow>
+              <TableCell colSpan={9} className={classes.empty}>{formatMessage('training.participant.empty')}</TableCell>
+            </TableRow>
+          )}
+          {items.map((p) => (
             <TableRow key={p.id}>
               <TableCell>{p.fullName}</TableCell>
               <TableCell>{userDisplayName(p.internalUser)}</TableCell>
               <TableCell>{p.session?.title ?? ''}</TableCell>
               <TableCell>
-                {/* Editable inline so historical rows, which all have a null gender, can be filled in. */}
-                <GenderPicker
-                  withNull
-                  readOnly={readOnly}
-                  value={p.gender}
-                  onChange={(v) => updateField(p, { gender: v })}
-                />
+                <GenderPicker withNull readOnly={readOnly} value={p.gender} onChange={(v) => updateField(p, { gender: v })} />
               </TableCell>
               <TableCell>
-                <ParticipantCategoryPicker
-                  readOnly={readOnly}
-                  levelCode={levelCode}
-                  value={p.category}
-                  onChange={(v) => updateField(p, { categoryId: decId(v?.id) })}
-                />
+                <ParticipantCategoryPicker readOnly={readOnly} levelCode={levelCode} value={p.category}
+                  onChange={(v) => updateField(p, { categoryId: decId(v?.id) })} />
               </TableCell>
               <TableCell>{p.organization}</TableCell>
               <TableCell>{p.phone}</TableCell>
               <TableCell>
-                <AttendanceStatusPicker
-                  readOnly={readOnly}
-                  value={p.attendanceStatus}
-                  onChange={(v) => updateField(p, { attendanceStatus: v })}
-                />
+                <AttendanceStatusPicker readOnly={readOnly} value={p.attendanceStatus}
+                  onChange={(v) => v && updateField(p, { attendanceStatus: v })} />
               </TableCell>
               <TableCell>
                 {!readOnly && (
                   <Tooltip title={formatMessage('deleteButton.tooltip')}>
-                    <IconButton size="small" onClick={() => remove(p)}><DeleteIcon /></IconButton>
+                    <IconButton size="small" onClick={() => setToDelete(p)}><DeleteIcon /></IconButton>
                   </Tooltip>
                 )}
               </TableCell>
             </TableRow>
           ))}
-          {!readOnly && (
-            <TableRow>
-              <TableCell>
-                <TextInput module="training" value={row.fullName} onChange={(v) => setRow({ ...row, fullName: v })} />
-              </TableCell>
-              <TableCell>
-                {/* Picking a system user fills the name so staff attendees don't have to be
-                    retyped, but never overwrites a name already entered by hand. */}
-                <PublishedComponent
-                  pubRef="admin.UserPicker"
-                  module="training"
-                  value={row.internalUser}
-                  onChange={pickInternalUser}
-                />
-              </TableCell>
-              <TableCell>
-                {sessionOptions.find((o) => o.value === row.sessionId)?.label ?? ''}
-              </TableCell>
-              <TableCell>
-                <GenderPicker withNull value={row.gender} onChange={(v) => setRow({ ...row, gender: v })} />
-              </TableCell>
-              <TableCell>
-                <ParticipantCategoryPicker
-                  levelCode={levelCode}
-                  value={row.category}
-                  onChange={(v) => setRow({ ...row, category: v })}
-                />
-              </TableCell>
-              <TableCell>
-                <TextInput module="training" value={row.organization} onChange={(v) => setRow({ ...row, organization: v })} />
-              </TableCell>
-              <TableCell>
-                <TextInput module="training" value={row.phone} onChange={(v) => setRow({ ...row, phone: v })} />
-              </TableCell>
-              <TableCell>
-                <AttendanceStatusPicker value={row.attendanceStatus} onChange={(v) => setRow({ ...row, attendanceStatus: v })} />
-              </TableCell>
-              <TableCell>
-                <Button variant="contained" size="small" color="primary" onClick={add} disabled={!row.fullName}>
-                  {formatMessage('addButton')}
-                </Button>
-              </TableCell>
-            </TableRow>
-          )}
         </TableBody>
       </Table>
     </>
@@ -199,6 +217,7 @@ const mapStateToProps = (state) => ({
   trainingSessions: state.training.trainingSessions,
   submittingMutation: state.training.submittingMutation,
   mutation: state.training.mutation,
+  confirmed: state.core.confirmed,
 });
 const mapDispatchToProps = (dispatch) => bindActionCreators(
   {
@@ -207,6 +226,8 @@ const mapDispatchToProps = (dispatch) => bindActionCreators(
     saveTrainingParticipant,
     deleteTrainingParticipant,
     journalize,
+    coreConfirm,
+    clearConfirm,
   }, dispatch,
 );
 
