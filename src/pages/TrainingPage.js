@@ -26,6 +26,11 @@ const useStyles = makeStyles((theme) => ({ page: theme.page }));
 // step forward is filled, matching the approval pages.
 const SECONDARY_ACTIONS = ['reject', 'cancel', 'revise'];
 
+const dateFromQuery = (search) => {
+  const date = new URLSearchParams(search || '').get('date');
+  return date && /^\d{4}-\d{2}-\d{2}$/.test(date) ? { startDatetime: date, endDatetime: date } : {};
+};
+
 function TrainingPage({ trainingUuid }) {
   const classes = useStyles();
   const dispatch = useDispatch();
@@ -38,7 +43,10 @@ function TrainingPage({ trainingUuid }) {
   const submittingMutation = useSelector((s) => s.training.submittingMutation);
   const trainingConflicts = useSelector((s) => s.training.trainingConflicts);
 
-  const [edited, setEdited] = useState({ status: TRAINING_STATUS.DRAFT });
+  const [edited, setEdited] = useState({
+    status: TRAINING_STATUS.DRAFT,
+    ...(trainingUuid ? {} : dateFromQuery(history.location?.search)),
+  });
   const [resetKey, setResetKey] = useState(0);
   const [rescheduling, setRescheduling] = useState(false);
   const prev = useRef();

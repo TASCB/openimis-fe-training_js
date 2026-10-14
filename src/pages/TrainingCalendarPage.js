@@ -45,7 +45,7 @@ function TrainingCalendarPage() {
         sourceColors={CALENDAR_SOURCE_COLORS}
         ownSource="TRAINING"
         onOpenEvent={(e) => (e.source && e.source !== 'TRAINING' ? null : history.push(`/${detailRef}/${e.id}`))}
-        onCreate={rights.includes(RIGHT_TRAINING_CREATE) ? () => history.push(`/${detailRef}`) : null}
+        onCreate={rights.includes(RIGHT_TRAINING_CREATE) ? (date) => history.push(`/${detailRef}${date ? `?date=${date}` : ''}`) : null}
         title={formatMessage('training.calendar.page.title')}
         subtitle={formatMessage('training.calendar.subtitle')}
       />
