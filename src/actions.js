@@ -233,9 +233,34 @@ export function fetchTrainingCategories(modulesManager, params = ['first: 100', 
   return graphql(payload, ACTION_TYPE.SEARCH_CATEGORIES);
 }
 
+const PAGE_SIZE = 100;
+
+function fetchAllPages(field, filters, projection, type) {
+  return async (dispatch) => {
+    dispatch({ type: REQUEST(type) });
+    const edges = [];
+    let after = null;
+    do {
+      const params = [...filters, `first: ${PAGE_SIZE}`, ...(after ? [`after: "${after}"`] : [])];
+      // eslint-disable-next-line no-await-in-loop
+      const response = await dispatch(graphql(formatPageQueryWithCount(field, params, projection), `${type}_PAGE`));
+      const page = response?.payload?.data?.[field];
+      if (!response || response.error || response.payload?.errors || !page) {
+        dispatch({ type: ERROR(type), payload: response?.payload });
+        return;
+      }
+      edges.push(...page.edges);
+      after = page.pageInfo?.hasNextPage ? page.pageInfo.endCursor : null;
+    } while (after);
+    dispatch({
+      type: SUCCESS(type),
+      payload: { data: { [field]: { totalCount: edges.length, pageInfo: { hasNextPage: false }, edges } } },
+    });
+  };
+}
+
 export function fetchTrainingAssignments(trainingId) {
-  const payload = formatPageQueryWithCount('trainingAssignment', [`trainingId: "${encId('TrainingGQLType', trainingId)}"`, 'first: 100'], ASSIGNMENT_PROJECTION());
-  return graphql(payload, ACTION_TYPE.SEARCH_ASSIGNMENTS);
+  return fetchAllPages('trainingAssignment', [`trainingId: "${encId('TrainingGQLType', trainingId)}"`], ASSIGNMENT_PROJECTION(), ACTION_TYPE.SEARCH_ASSIGNMENTS);
 }
 
 function formatAssignmentGQL(a) {
@@ -274,8 +299,7 @@ export function deleteTrainingAssignment(a, clientMutationLabel) {
 }
 
 export function fetchTrainingParticipants(trainingId) {
-  const payload = formatPageQueryWithCount('trainingParticipant', [`trainingId: "${encId('TrainingGQLType', trainingId)}"`, 'first: 100'], PARTICIPANT_PROJECTION());
-  return graphql(payload, ACTION_TYPE.SEARCH_PARTICIPANTS);
+  return fetchAllPages('trainingParticipant', [`trainingId: "${encId('TrainingGQLType', trainingId)}"`], PARTICIPANT_PROJECTION(), ACTION_TYPE.SEARCH_PARTICIPANTS);
 }
 
 // Standalone attendance list (paginated + filterable Searcher).
@@ -347,8 +371,7 @@ function formatSessionGQL(s) {
 }
 
 export function fetchTrainingSessions(trainingId) {
-  const payload = formatPageQueryWithCount('trainingSession', [`trainingId: "${encId('TrainingGQLType', trainingId)}"`, 'first: 100', 'orderBy: "sequence"'], SESSION_PROJECTION());
-  return graphql(payload, ACTION_TYPE.SEARCH_SESSIONS);
+  return fetchAllPages('trainingSession', [`trainingId: "${encId('TrainingGQLType', trainingId)}"`, 'orderBy: "sequence"'], SESSION_PROJECTION(), ACTION_TYPE.SEARCH_SESSIONS);
 }
 
 export function saveTrainingSession(s, clientMutationLabel) {
@@ -380,13 +403,11 @@ export function fetchSessionCheckinCount(sessionId) {
 }
 
 export function fetchTrainingMaterials(trainingId) {
-  const payload = formatPageQueryWithCount('trainingMaterial', [`trainingId: "${encId('TrainingGQLType', trainingId)}"`, 'first: 100'], FILE_PROJECTION());
-  return graphql(payload, ACTION_TYPE.SEARCH_MATERIALS);
+  return fetchAllPages('trainingMaterial', [`trainingId: "${encId('TrainingGQLType', trainingId)}"`], FILE_PROJECTION(), ACTION_TYPE.SEARCH_MATERIALS);
 }
 
 export function fetchTrainingEvidence(trainingId) {
-  const payload = formatPageQueryWithCount('trainingEvidence', [`trainingId: "${encId('TrainingGQLType', trainingId)}"`, 'first: 100'], ['evidenceType', ...FILE_PROJECTION()]);
-  return graphql(payload, ACTION_TYPE.SEARCH_EVIDENCE);
+  return fetchAllPages('trainingEvidence', [`trainingId: "${encId('TrainingGQLType', trainingId)}"`], ['evidenceType', ...FILE_PROJECTION()], ACTION_TYPE.SEARCH_EVIDENCE);
 }
 
 export function deleteTrainingMaterial(m, clientMutationLabel) {
