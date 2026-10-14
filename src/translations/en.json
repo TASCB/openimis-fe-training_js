@@ -281,6 +281,8 @@
   "training.calendar.prev": "Previous",
   "training.calendar.next": "Next",
   "training.calendar.statusFilter": "Filter by status",
+  "training.calendar.status": "Status",
+  "training.calendar.allStatuses": "All statuses",
   "training.calendar.dow.mon": "Mon",
   "training.calendar.dow.tue": "Tue",
   "training.calendar.dow.wed": "Wed",
