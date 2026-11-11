@@ -71,12 +71,15 @@ export const EVIDENCE_TYPE_LIST = [
 
 export const STATUS_ACTIONS = {
   DRAFT: [{ action: 'submit', right: RIGHT_TRAINING_UPDATE }, { action: 'cancel', right: RIGHT_TRAINING_UPDATE }],
-  SUBMITTED: [{ action: 'approve', right: RIGHT_TRAINING_APPROVE }, { action: 'reject', right: RIGHT_TRAINING_APPROVE }],
+  SUBMITTED: [
+    { action: 'approve', right: RIGHT_TRAINING_APPROVE },
+    { action: 'reject', right: RIGHT_TRAINING_APPROVE, dialog: 'reject' },
+  ],
   REJECTED: [{ action: 'revise', right: RIGHT_TRAINING_UPDATE }],
   APPROVED: [{ action: 'schedule', right: RIGHT_TRAINING_UPDATE }, { action: 'cancel', right: RIGHT_TRAINING_UPDATE }],
   SCHEDULED: [
     { action: 'start', right: RIGHT_TRAINING_UPDATE },
-    { action: 'reschedule', right: RIGHT_TRAINING_UPDATE, dialog: true },
+    { action: 'reschedule', right: RIGHT_TRAINING_UPDATE, dialog: 'reschedule' },
     { action: 'cancel', right: RIGHT_TRAINING_UPDATE },
   ],
   ONGOING: [{ action: 'complete', right: RIGHT_TRAINING_UPDATE }, { action: 'cancel', right: RIGHT_TRAINING_UPDATE }],

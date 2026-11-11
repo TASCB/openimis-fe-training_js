@@ -353,5 +353,10 @@
   "training.dashboard.total.caption": "All trainings on record",
   "training.dashboard.thisWeek.caption": "Starting within this week",
   "training.dashboard.upcoming.caption": "Approved or scheduled ahead",
-  "training.dashboard.activeTrainers.caption": "Trainers with an active profile"
+  "training.dashboard.activeTrainers.caption": "Trainers with an active profile",
+  "training.reject.title": "Reject training",
+  "training.reject.help": "Tell the officer what to change. They will see this reason on the training and in their notification.",
+  "training.reject.reason": "Reason",
+  "training.reject.cancel": "Cancel",
+  "training.reject.noteTitle": "Rejected — what to change"
 }

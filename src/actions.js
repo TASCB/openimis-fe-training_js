@@ -51,7 +51,7 @@ const ATTENDANCE_PROJECTION = () => [
 ];
 
 const FILE_PROJECTION = () => [
-  'id', 'fileName', 'fileType', 'description', 'fileUrl', 'dateCreated', 'userCreated { username }',
+  'id', 'fileName', 'fileType', 'description', 'dateCreated', 'userCreated { username }',
 ];
 
 
@@ -88,10 +88,9 @@ export function fetchTraining(modulesManager, params) {
 
 export const clearTraining = () => (dispatch) => dispatch({ type: CLEAR(ACTION_TYPE.GET_TRAINING) });
 
-function formatTrainingGQL(t, includeCode = true) {
+function formatTrainingGQL(t) {
   return [
     str('id', t?.id),
-    includeCode ? str('code', t?.code) : null,
     str('title', t?.title),
     str('description', t?.description),
     str('categoryId', decId(t?.categoryId ?? t?.category?.id)),
@@ -100,19 +99,16 @@ function formatTrainingGQL(t, includeCode = true) {
     str('endDatetime', toISO(t?.endDatetime, true)),
     str('venue', t?.venue),
     raw('locationId', decId(t?.locationId ?? t?.location?.id)),
-    str('paaReference', t?.paaReference),
-    raw('status', t?.status),
     raw('expectedParticipants', t?.expectedParticipants),
     strList('learningOutcomes', t?.learningOutcomes),
     strList('intendedFor', t?.intendedFor),
-    raw('ignoreConflicts', t?.ignoreConflicts),
     list('conflictTrainerIds', t?.conflictTrainerIds),
     list('conflictStaffUserIds', t?.conflictStaffUserIds),
   ].filter(Boolean).join('\n');
 }
 
 export function createTraining(training, clientMutationLabel) {
-  const mutation = formatMutation('createTraining', formatTrainingGQL(training, false), clientMutationLabel);
+  const mutation = formatMutation('createTraining', formatTrainingGQL(training), clientMutationLabel);
   return graphql(
     mutation.payload,
     [REQUEST(ACTION_TYPE.MUTATION), SUCCESS(ACTION_TYPE.CREATE_TRAINING), ERROR(ACTION_TYPE.MUTATION)],
@@ -121,7 +117,7 @@ export function createTraining(training, clientMutationLabel) {
 }
 
 export function updateTraining(training, clientMutationLabel) {
-  const mutation = formatMutation('updateTraining', formatTrainingGQL(training, true), clientMutationLabel);
+  const mutation = formatMutation('updateTraining', formatTrainingGQL(training), clientMutationLabel);
   return graphql(
     mutation.payload,
     [REQUEST(ACTION_TYPE.MUTATION), SUCCESS(ACTION_TYPE.UPDATE_TRAINING), ERROR(ACTION_TYPE.MUTATION)],

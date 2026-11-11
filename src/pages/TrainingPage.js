@@ -18,6 +18,8 @@ import TrainingHeadPanel from '../components/TrainingHeadPanel';
 import ConflictBanner from '../components/ConflictBanner';
 import TrainingTabs from '../components/TrainingTabs';
 import RescheduleDialog from '../components/RescheduleDialog';
+import RejectDialog from '../components/RejectDialog';
+import RejectionNote from '../components/RejectionNote';
 import { isPaaComplete } from '../utils/paa';
 
 const useStyles = makeStyles((theme) => ({ page: theme.page }));
@@ -49,6 +51,7 @@ function TrainingPage({ trainingUuid }) {
   });
   const [resetKey, setResetKey] = useState(0);
   const [rescheduling, setRescheduling] = useState(false);
+  const [rejecting, setRejecting] = useState(false);
   const prev = useRef();
 
   const isNew = !trainingUuid;
@@ -98,6 +101,13 @@ function TrainingPage({ trainingUuid }) {
 
   const onAction = (action) => dispatch(transitionTraining(action, edited, actionLabel(action)));
 
+  const onReject = (reason) => {
+    setRejecting(false);
+    dispatch(transitionTraining('reject', edited, actionLabel('reject'), reason));
+  };
+
+  const openDialog = { reschedule: () => setRescheduling(true), reject: () => setRejecting(true) };
+
   const onReschedule = (dates) => {
     setRescheduling(false);
     dispatch(rescheduleTraining(edited, dates, actionLabel('reschedule')));
@@ -118,7 +128,7 @@ function TrainingPage({ trainingUuid }) {
         <Button
           variant={SECONDARY_ACTIONS.includes(a.action) ? 'text' : 'contained'}
           color="primary"
-          onClick={a.dialog ? () => setRescheduling(true) : () => onAction(a.action)}
+          onClick={a.dialog ? openDialog[a.dialog] : () => onAction(a.action)}
         >
           {formatMessage(`training.action.${a.action}`)}
         </Button>
@@ -126,7 +136,7 @@ function TrainingPage({ trainingUuid }) {
     }));
 
   const getPanels = () => {
-    const panels = [TrainingHeadPanel, ConflictBanner];
+    const panels = [RejectionNote, TrainingHeadPanel, ConflictBanner];
     if (!isNew) panels.push(TrainingTabs);
     return panels;
   };
@@ -163,6 +173,7 @@ function TrainingPage({ trainingUuid }) {
         onClose={() => setRescheduling(false)}
         onConfirm={onReschedule}
       />
+      <RejectDialog open={rejecting} onClose={() => setRejecting(false)} onConfirm={onReject} />
     </div>
   );
 }

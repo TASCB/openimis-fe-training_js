@@ -120,7 +120,7 @@ function TrainingSearcher({
       </Tooltip>
     ));
     if (rights.includes(RIGHT_TRAINING_DELETE)) {
-      f.push((t) => (![TRAINING_STATUS.CLOSED].includes(t?.status) ? (
+      f.push((t) => ([TRAINING_STATUS.DRAFT, TRAINING_STATUS.REJECTED].includes(t?.status) ? (
         <Tooltip title={formatMessage('deleteButton.tooltip')}>
           <IconButton onClick={() => setToDelete(t)}><DeleteIcon /></IconButton>
         </Tooltip>
